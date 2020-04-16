@@ -1,0 +1,13 @@
+[package]
+name = "jlink-rtx-plugin"
+version = "0.1.0"
+authors = ["user"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+const-cstr = "0.3.0"
+
+[build-dependencies]
+bindgen = "0.53.2"
