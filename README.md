@@ -1,2 +1,1 @@
-# jlink-rtx-plugin
-J-Link GDB Server RTX Plug-In, written in Rust
+# J-Link GDB Server RTOS Plug-In - RTX
