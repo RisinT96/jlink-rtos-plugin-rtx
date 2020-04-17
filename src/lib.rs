@@ -1,15 +1,17 @@
 //! Rust Implementation of the J-Link GDB Server RTOS Plug-In for the RTXv5 RTOS.
 
-/// STD Includes.
-use std::os::raw::{c_char, c_int, c_uint};
+/// J-Link GDB Server and RTXv5 c bindings.
+mod bindings;
+
+/// Module used for safely interacting with the API provided by the J-Link GDB Server.
+mod api;
 
 /// Crate used for working with static and constant C strings, necessary for requesting symbols from the GDB Server.
 #[macro_use]
 extern crate const_cstr;
 
-/// J-Link GDB Server and RTXv5 APIs.
-mod api;
-use api::jlink::{GDB_API as GdbApi, RTOS_SYMBOLS as RtosSymbols};
+use bindings::jlink::{GDB_API as GdbApi, RTOS_SYMBOLS as RtosSymbols};
+use std::os::raw::{c_char, c_int, c_uint};
 
 /* ------------------------------------- Constants ------------------------------------------------------------------ */
 
@@ -20,11 +22,20 @@ const_cstr! {
 
 /// Static array of structs, each containing the requested symbol from the GDB server.
 /// When `RTOS_GetSymbols` is called, it fills in the empty pointers and sends the request to the GDB Server.
-static mut RTOS_SYMBOLS_TABLE: [RtosSymbols; 1] = [RtosSymbols {
-    name: 0 as *const c_char, // Fill with `osRtxInfo`.
-    optional: 0,              // This symbol is mandatory.
-    address: 0,               // This will hold the symbol address.
-}];
+static mut RTOS_SYMBOLS_ARR: [RtosSymbols; 2] = [
+    // osRtxInfo
+    RtosSymbols {
+        name: 0 as *const c_char, // Fill with `osRtxInfo`.
+        optional: 0,              // This symbol is mandatory.
+        address: 0,               // This will hold the symbol address.
+    },
+    // End Marker
+    RtosSymbols {
+        name: 0 as *const c_char, // Fill with `osRtxInfo`.
+        optional: 0,              // This symbol is mandatory.
+        address: 0,               // This will hold the symbol address.
+    },
+];
 
 /* ------------------------------------- Constants ------------------------------------------------------------------ */
 
@@ -45,7 +56,6 @@ pub extern "C" fn RTOS_GetVersion() -> c_uint {
     (MAJOR * 100) + (MINOR * 10) + (PATCH)
 }
 
-#[no_mangle]
 /// Returns a person with the name given them
 ///
 /// # Arguments
@@ -60,8 +70,9 @@ pub extern "C" fn RTOS_GetVersion() -> c_uint {
 /// use doc::Person;
 /// let person = Person::new("name");
 /// ```
+#[no_mangle]
 pub extern "C" fn RTOS_Init(p_api: *const GdbApi, _core: c_uint) -> c_int {
-    match api::init_gdb_server_api(p_api) {
+    match api::init(p_api) {
         Err(_) => return 0,
         _ => (),
     }
@@ -71,10 +82,9 @@ pub extern "C" fn RTOS_Init(p_api: *const GdbApi, _core: c_uint) -> c_int {
 
 #[no_mangle]
 pub extern "C" fn RTOS_GetSymbols() -> *mut RtosSymbols {
-    let rtx_info_cstr_ptr = RTX_INFO_CSTR.as_ptr();
     unsafe {
-        RTOS_SYMBOLS_TABLE[0].name = rtx_info_cstr_ptr;
-        RTOS_SYMBOLS_TABLE.as_mut_ptr()
+        RTOS_SYMBOLS_ARR[0].name = RTX_INFO_CSTR.as_ptr();
+        RTOS_SYMBOLS_ARR.as_mut_ptr()
     }
 }
 
