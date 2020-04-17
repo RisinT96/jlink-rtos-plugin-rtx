@@ -6,6 +6,9 @@ mod bindings;
 /// Module used for safely interacting with the API provided by the J-Link GDB Server.
 mod api;
 
+/// Custom allocator that utilizes the GDB Server API for memory allocation.
+mod allocator;
+
 /// Crate used for working with static and constant C strings, necessary for requesting symbols from the GDB Server.
 #[macro_use]
 extern crate const_cstr;
