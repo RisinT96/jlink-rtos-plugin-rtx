@@ -1,43 +1,76 @@
-mod api;
+//! Rust Implementation of the J-Link GDB Server RTOS Plug-In for the RTXv5 RTOS.
 
-use api::jlink::{GDB_API, RTOS_SYMBOLS};
-use api::rtx::osRtxInfo_t;
+/// STD Includes.
 use std::os::raw::{c_char, c_int, c_uint};
 
+/// Crate used for working with static and constant C strings, necessary for requesting symbols from the GDB Server.
 #[macro_use]
 extern crate const_cstr;
 
-// Static & constant c strings necessary to get symbols from the GDB server.
+/// J-Link GDB Server and RTXv5 APIs.
+mod api;
+use api::jlink::{GDB_API as GdbApi, RTOS_SYMBOLS as RtosSymbols};
+
+/* ------------------------------------- Constants ------------------------------------------------------------------ */
+
 const_cstr! {
+    // Symbol for the main OS control block.
     RTX_INFO_CSTR = "osRtxInfo";
 }
 
-// Static array of structs, each containing the requested symbol from the GDB server.
-// When `RTOS_GetSymbols` is called, it fills in the empty pointers and sends the request to the GDB server.
-static mut RTOS_SYMBOLS_TABLE: [RTOS_SYMBOLS; 1] = [RTOS_SYMBOLS {
+/// Static array of structs, each containing the requested symbol from the GDB server.
+/// When `RTOS_GetSymbols` is called, it fills in the empty pointers and sends the request to the GDB Server.
+static mut RTOS_SYMBOLS_TABLE: [RtosSymbols; 1] = [RtosSymbols {
     name: 0 as *const c_char, // Fill with `osRtxInfo`.
     optional: 0,              // This symbol is mandatory.
     address: 0,               // This will hold the symbol address.
 }];
 
-static mut API: *const GDB_API = 0 as *const GDB_API;
+/* ------------------------------------- Constants ------------------------------------------------------------------ */
 
-#[no_mangle]
-pub extern "C" fn RTOS_Init(p_api: *const GDB_API, _core: c_uint) -> c_int {
-    unsafe {
-        API = p_api;
-    }
+/// Returns the RTOS plugin version.
+///
+/// # Return value
+/// The plugin version number as unsigned integer: 100 * [major] + 10 * [minor] + [patch].
 
-    0
-}
-
+/// # Notes:
+/// Will be called before any other function. The J-Link GDB server only checks the RTOS plugin’s major version number.
+/// The minor version number is freely choosable, it is printed in the GDB server’s log file but it is not evaluated.
 #[no_mangle]
 pub extern "C" fn RTOS_GetVersion() -> c_uint {
-    0
+    const MAJOR: c_uint = pkg_version::pkg_version_major!();
+    const MINOR: c_uint = pkg_version::pkg_version_minor!();
+    const PATCH: c_uint = pkg_version::pkg_version_patch!();
+
+    (MAJOR * 100) + (MINOR * 10) + (PATCH)
 }
 
 #[no_mangle]
-pub extern "C" fn RTOS_GetSymbols() -> *mut RTOS_SYMBOLS {
+/// Returns a person with the name given them
+///
+/// # Arguments
+///
+/// * `name` - A string slice that holds the name of the person
+///
+/// # Example
+///
+/// ```
+/// // You can have rust code between fences inside the comments
+/// // If you pass --test to Rustdoc, it will even test it for you!
+/// use doc::Person;
+/// let person = Person::new("name");
+/// ```
+pub extern "C" fn RTOS_Init(p_api: *const GdbApi, _core: c_uint) -> c_int {
+    match api::init_gdb_server_api(p_api) {
+        Err(_) => return 0,
+        _ => (),
+    }
+
+    return 1;
+}
+
+#[no_mangle]
+pub extern "C" fn RTOS_GetSymbols() -> *mut RtosSymbols {
     let rtx_info_cstr_ptr = RTX_INFO_CSTR.as_ptr();
     unsafe {
         RTOS_SYMBOLS_TABLE[0].name = rtx_info_cstr_ptr;

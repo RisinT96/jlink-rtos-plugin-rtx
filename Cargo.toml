@@ -1,6 +1,6 @@
 [package]
 name = "jlink-rtx-plugin"
-version = "0.1.0"
+version = "1.0.0"
 authors = ["Tal Risin <risint96@gmail.com>"]
 edition = "2018"
 
@@ -8,6 +8,11 @@ edition = "2018"
 
 [dependencies]
 const-cstr = "0.3.0"
+pkg-version = "1.0.0"
 
 [build-dependencies]
 bindgen = "0.53.2"
+
+[lib]
+name = "rtx_plugin"
+crate-type = ["dylib"]
