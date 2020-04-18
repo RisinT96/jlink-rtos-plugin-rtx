@@ -76,17 +76,14 @@ pub extern "C" fn RTOS_GetVersion() -> c_uint {
 /// memory.
 #[no_mangle]
 pub extern "C" fn RTOS_Init(p_api: *const api::GdbApi, core: c_uint) -> c_int {
-    match api::init(p_api) {
+    // Initialize the GDB Server interface module
+    match gdb::init(p_api, log::Level::Info) {
         Err(_) => return 0,
         _ => (),
     };
 
-    match gdb::log::init_with_level(log::Level::Info) {
-        Err(_) => return 0,
-        _ => (),
-    };
-
-    info!("Initializing RTX Plugin!");
+    // Now the underlying systems should be initialized, we can begin work.
+    info!("Initializing RTX Plugin");
 
     match core {
         bindings::jlink::JLINK_CORE_CORTEX_M0
@@ -95,6 +92,8 @@ pub extern "C" fn RTOS_Init(p_api: *const api::GdbApi, core: c_uint) -> c_int {
         | bindings::jlink::JLINK_CORE_CORTEX_M4 => (),
         _ => return 0,
     };
+
+    info!("Successfully initialized RTX Plugin");
 
     return 1;
 }
