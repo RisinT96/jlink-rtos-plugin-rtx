@@ -22,7 +22,7 @@ use bindings::rtos;
 mod gdb;
 use gdb::api;
 
-/* ------------------------------------- Constants ------------------------------------------------------------------ */
+/* ------------------------------------- Static State Variables ----------------------------------------------------- */
 
 /// Symbols we want the GDB Server to find on the debugged device.
 static mut RTOS_SYMBOLS_ARR: [RtosSymbols; 2] = [
@@ -130,7 +130,10 @@ pub extern "C" fn RTOS_GetSymbols() -> *mut RtosSymbols {
 ///   be read only when requested.
 #[no_mangle]
 pub extern "C" fn RTOS_UpdateThreads() -> c_int {
-    trace!("RTOS_UpdateThreads enter");
+    trace!("RTOS_UpdateThreads");
+    debug!("Reading RTX Control Block");
+    let rtx_info: rtos::osRtxInfo_t =
+        ensure!(api::read_mem(unsafe { RTOS_SYMBOLS_ARR[0].address }));
 
     0
 }
