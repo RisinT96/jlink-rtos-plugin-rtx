@@ -15,6 +15,7 @@ mod bindings;
 use bindings::jlink::RTOS_SYMBOLS as RtosSymbols;
 
 /// Module used for safely interacting with the API provided by the J-Link GDB Server.
+#[macro_use]
 mod gdb;
 use gdb::api;
 
@@ -44,7 +45,7 @@ static mut RTOS_SYMBOLS_ARR: [RtosSymbols; 2] = [
 ///
 /// # Return value
 /// The plugin version number as unsigned integer: `(100 * [major]) + (10 * [minor]) + [patch]`.
-
+///
 /// # Notes:
 /// * __Will be called before any other function.__
 /// * The J-Link GDB server only checks the RTOS plugin’s major version number.
@@ -61,7 +62,6 @@ pub extern "C" fn RTOS_GetVersion() -> c_uint {
 /// Initializes RTOS plug-in for further usage.
 ///
 /// # Parameters
-///
 /// * `pAPI` - Pointer to API functions table.
 /// * `core` - JLINK_CORE_# constant identifying the target’s core.
 ///
@@ -70,10 +70,10 @@ pub extern "C" fn RTOS_GetVersion() -> c_uint {
 /// * `== 1` - Initialized successfully.
 ///
 /// # Notes:
-/// If the plug-in does not support the CPU architecture, it should return 0.
-/// The pointer to the API functions table should be stored locally.
-/// API funtions can be used later by the plug-in to perform special functions like reading or writing to target
-/// memory.
+/// * If the plug-in does not support the CPU architecture, it should return 0.
+/// * The pointer to the API functions table should be stored locally.
+/// * API funtions can be used later by the plug-in to perform special functions like reading or writing to target
+///   memory.
 #[no_mangle]
 pub extern "C" fn RTOS_Init(p_api: *const api::GdbApi, core: c_uint) -> c_int {
     // Initialize the GDB Server interface module
@@ -104,14 +104,34 @@ pub extern "C" fn RTOS_Init(p_api: *const api::GdbApi, core: c_uint) -> c_int {
 /// Pointer to the RTOS symbol table.
 ///
 /// # Notes:
-/// The J-Link GDB server tries to find addresses of all of the symbols specified in the RTOS symbol table.
-/// If a symbol is found, its address is written into RTOS_SYMBOLS.address, otherwise NULL is written into the address
-/// field.
-/// If any of the symbols, declared as mandatory, is not found, the plug-in is not being used by the GDB server.
-/// It is ensured for the following functions, that every mandatory symbol has a valid address entry.
+/// * The J-Link GDB server tries to find addresses of all of the symbols specified in the RTOS symbol table.
+/// * If a symbol is found, its address is written into RTOS_SYMBOLS.address, otherwise NULL is written into the address
+///   field.
+/// * If any of the symbols, declared as mandatory, is not found, the plug-in is not being used by the GDB server.
+/// * __It is ensured for the following functions, that every mandatory symbol has a valid address entry__.
 #[no_mangle]
 pub extern "C" fn RTOS_GetSymbols() -> *mut RtosSymbols {
+    trace!("RTOS_GetSymbols");
+
     unsafe { RTOS_SYMBOLS_ARR.as_mut_ptr() }
+}
+
+/// Updates the thread information from the target.
+///
+/// # Return value:
+/// * `== 0` - Updating threads OK.
+/// * `<  0` - Updating threads failed.
+///
+/// # Notes:
+/// * For efficiency purposes, the plug-in should read all required information within this function at once, so later
+///   requests can be served without further communication to the target.
+/// * IMO - We should only read the minimal data we need to know the state of all the threads, any further data should
+///   be read only when requested.
+#[no_mangle]
+pub extern "C" fn RTOS_UpdateThreads() -> c_int {
+    trace!("RTOS_UpdateThreads enter");
+
+    0
 }
 
 #[no_mangle]
@@ -159,10 +179,5 @@ pub extern "C" fn RTOS_SetThreadReg(
 
 #[no_mangle]
 pub extern "C" fn RTOS_SetThreadRegList(_p_hex_reg_list: *mut c_char, _thread_id: c_uint) -> c_int {
-    0
-}
-
-#[no_mangle]
-pub extern "C" fn RTOS_UpdateThreads() -> c_int {
     0
 }

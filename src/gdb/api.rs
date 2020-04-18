@@ -5,8 +5,16 @@ use std::ffi::CString;
 
 pub use crate::bindings::jlink::GDB_API as GdbApi;
 
-const OK: i32 = 0;
-const ERR: i32 = -1;
+pub const OK: i32 = 0;
+pub const ERR: i32 = -1;
+
+macro_rules! ensure_ok {
+    ($op:expr) => {
+        if($op != crate::gdb::api::OK) {
+            return crate::gdb::api::ERR;
+        }
+    };
+}
 
 /// Pointer to struct holding the API provided by the GDB Server, initialized in `RTOS_Init`.jlink
 /// Must not be changed after that.
