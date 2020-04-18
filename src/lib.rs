@@ -2,31 +2,23 @@
 
 /* ------------------------------------- Crates and Modules  -------------------------------------------------------- */
 
-/// fstring - for easier log string creation.
+/// For easier log/string creation.
 #[macro_use]
 extern crate ifmt;
 
-/// J-Link GDB Server and RTXv5 c bindings.
-mod bindings;
-
-/// Module used for safely interacting with the API provided by the J-Link GDB Server.
-mod gdb_api;
-
-/// Custom allocator that utilizes the GDB Server API for memory allocation.
-mod gdb_allocator;
-
-/// Custom logger that logs through the GDB Server.
+/// For custom logger that logs through the GDB Server.
 #[macro_use]
 extern crate log;
-mod gdb_logger;
 
-use bindings::jlink::{GDB_API as GdbApi, RTOS_SYMBOLS as RtosSymbols};
+/// J-Link GDB Server and RTXv5 c bindings.
+mod bindings;
+use bindings::jlink::RTOS_SYMBOLS as RtosSymbols;
+
+/// Module used for safely interacting with the API provided by the J-Link GDB Server.
+mod gdb;
+use gdb::api;
+
 use std::os::raw::{c_char, c_int, c_uint};
-
-/* ------------------------------------- Global Config--------------------------------------------------------------- */
-
-#[global_allocator]
-static ALLOCATOR: gdb_allocator::GdbAllocator = gdb_allocator::GdbAllocator;
 
 /* ------------------------------------- Constants ------------------------------------------------------------------ */
 
@@ -83,13 +75,13 @@ pub extern "C" fn RTOS_GetVersion() -> c_uint {
 /// API funtions can be used later by the plug-in to perform special functions like reading or writing to target
 /// memory.
 #[no_mangle]
-pub extern "C" fn RTOS_Init(p_api: *const GdbApi, core: c_uint) -> c_int {
-    match gdb_api::init(p_api) {
+pub extern "C" fn RTOS_Init(p_api: *const api::GdbApi, core: c_uint) -> c_int {
+    match api::init(p_api) {
         Err(_) => return 0,
         _ => (),
     };
 
-    match gdb_logger::init_with_level(log::Level::Info) {
+    match gdb::log::init_with_level(log::Level::Info) {
         Err(_) => return 0,
         _ => (),
     };

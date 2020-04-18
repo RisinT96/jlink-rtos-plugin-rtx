@@ -3,7 +3,7 @@ use std::ptr::null_mut;
 
 use std::ffi::CString;
 
-use crate::bindings::jlink::GDB_API as GdbApi;
+pub use crate::bindings::jlink::GDB_API as GdbApi;
 
 const OK: i32 = 0;
 const ERR: i32 = -1;
