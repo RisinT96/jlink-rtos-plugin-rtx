@@ -21,6 +21,11 @@ struct Thread<'a> {
     state: &'a str,
 }
 
+#[derive(Debug)]
+struct RtxInfo<'a> {
+    threads : Vec<Thread<'a>>,
+}
+
 impl TryFrom<osRtxThread_t> for Thread<'_> {
     type Error = i32;
 
