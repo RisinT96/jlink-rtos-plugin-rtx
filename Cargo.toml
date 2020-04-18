@@ -1,17 +1,15 @@
 [package]
-name = "jlink-rtx-plugin"
-version = "1.0.0"
-authors = ["Tal Risin <risint96@gmail.com>"]
-edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+name = 'jlink-rtx-plugin'
+version = '1.0.0'
+authors = ['Tal Risin <risint96@gmail.com>']
+edition = '2018'
 
 [dependencies]
-pkg-version = "1.0.0"
+pkg-version = '1.0.0'
 
 [build-dependencies]
-bindgen = "0.53.2"
+bindgen = '0.53.2'
 
 [lib]
-name = "rtx_plugin"
-crate-type = ["dylib"]
+name = 'rtx_plugin'
+crate-type = ['dylib']
