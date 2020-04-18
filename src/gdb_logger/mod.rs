@@ -4,7 +4,7 @@
 use log::{Level, Metadata, Record, SetLoggerError};
 
 /// GDB Server api.
-use crate::api;
+use crate::gdb_api;
 
 struct GdbLogger {
     level: Level,
@@ -23,10 +23,10 @@ impl log::Log for GdbLogger {
         let msg = iformat!(record.level() " - " record.args());
 
         match record.level() {
-            Level::Trace | Level::Info => api::print(&msg),
-            Level::Debug => api::print_debug(&msg),
-            Level::Warn => api::print_warning(&msg),
-            Level::Error => api::print_error(&msg),
+            Level::Trace | Level::Info => gdb_api::print(&msg),
+            Level::Debug => gdb_api::print_debug(&msg),
+            Level::Warn => gdb_api::print_warning(&msg),
+            Level::Error => gdb_api::print_error(&msg),
         };
     }
 

@@ -10,7 +10,7 @@ extern crate ifmt;
 mod bindings;
 
 /// Module used for safely interacting with the API provided by the J-Link GDB Server.
-mod api;
+mod gdb_api;
 
 /// Custom allocator that utilizes the GDB Server API for memory allocation.
 mod allocator;
@@ -79,7 +79,7 @@ pub extern "C" fn RTOS_GetVersion() -> c_uint {
 /// memory.
 #[no_mangle]
 pub extern "C" fn RTOS_Init(p_api: *const GdbApi, core: c_uint) -> c_int {
-    match api::init(p_api) {
+    match gdb_api::init(p_api) {
         Err(_) => return 0,
         _ => (),
     };
