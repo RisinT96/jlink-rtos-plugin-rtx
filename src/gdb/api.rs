@@ -3,16 +3,18 @@ use std::ptr::null_mut;
 
 use std::ffi::CString;
 
+extern crate memchr;
+
 pub use crate::bindings::jlink::GDB_API as GdbApi;
 
-pub const OK: i32 = 0;
-pub const ERR: i32 = -1;
+pub const GDB_OK: i32 = 0;
+pub const GDB_ERR: i32 = -1;
 
 macro_rules! ensure {
     ($fun:expr) => {
         match ($fun) {
             Ok(v) => v,
-            Err(_) => return crate::gdb::api::ERR,
+            Err(_) => return crate::gdb::api::GDB_ERR,
         }
     };
 }
@@ -130,10 +132,10 @@ pub fn read_mem<T>(addr: u32) -> Result<T, i32> {
                 value.as_mut_ptr() as *mut c_char,
                 std::mem::size_of::<T>() as c_uint,
             ) {
-                OK => Ok(value.assume_init()),
+                GDB_OK => Ok(value.assume_init()),
                 e => Err(e),
             },
-            None => Err(ERR),
+            None => Err(GDB_ERR),
         }
     }
 }
@@ -144,10 +146,10 @@ pub fn read_u8(addr: u32) -> Result<u8, i32> {
     unsafe {
         match GDB_API.pfReadU8 {
             Some(f) => match f(addr, &mut buff) {
-                OK => Ok(buff),
+                GDB_OK => Ok(buff),
                 e => Err(e),
             },
-            None => Err(ERR),
+            None => Err(GDB_ERR),
         }
     }
 }
@@ -158,10 +160,10 @@ pub fn read_u16(addr: u32) -> Result<u16, i32> {
     unsafe {
         match GDB_API.pfReadU16 {
             Some(f) => match f(addr, &mut buff) {
-                OK => Ok(buff),
+                GDB_OK => Ok(buff),
                 e => Err(e),
             },
-            None => Err(ERR),
+            None => Err(GDB_ERR),
         }
     }
 }
@@ -172,10 +174,10 @@ pub fn read_u32(addr: u32) -> Result<u32, i32> {
     unsafe {
         match GDB_API.pfReadU32 {
             Some(f) => match f(addr, &mut buff) {
-                OK => Ok(buff),
+                GDB_OK => Ok(buff),
                 e => Err(e),
             },
-            None => Err(ERR),
+            None => Err(GDB_ERR),
         }
     }
 }
@@ -183,13 +185,13 @@ pub fn read_u32(addr: u32) -> Result<u32, i32> {
 pub fn write_mem<T>(addr: u32, data: &T) -> Result<(), i32> {
     unsafe {
         match GDB_API.pfWriteMem {
-            None => Err(ERR),
+            None => Err(GDB_ERR),
             Some(f) => match f(
                 addr,
                 data as *const T as *const c_char,
                 std::mem::size_of::<T>() as c_uint,
             ) {
-                OK => Ok(()),
+                GDB_OK => Ok(()),
                 e => Err(e),
             },
         }
@@ -221,4 +223,25 @@ pub fn write_u32(addr: u32, data: u32) {
             None => (),
         }
     }
+}
+
+pub fn read_string(addr: u32, len: usize) -> Result<String, i32> {
+    let mut temp_buff: Vec<u8> = vec![0u8; len];
+
+    unsafe {
+        if let Some(f) = GDB_API.pfReadMem {
+            if GDB_OK != f(addr, temp_buff.as_mut_ptr() as *mut c_char, len as c_uint) {
+                return Err(GDB_ERR);
+            }
+        }
+    }
+
+    // Find null terminator - '\0'
+    if let Some(pos) = memchr::memchr(0, &temp_buff) {
+        if let Ok(v) = std::str::from_utf8(&temp_buff[..=pos]) {
+            return Ok(v.to_owned());
+        }
+    }
+
+    Err(GDB_ERR)
 }
