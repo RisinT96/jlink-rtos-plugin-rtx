@@ -1,5 +1,11 @@
 //! Rust Implementation of the J-Link GDB Server RTOS Plug-In for the RTXv5 RTOS.
 
+/* ------------------------------------- Crates and Modules  -------------------------------------------------------- */
+
+/// fstring - for easier log string creation.
+#[macro_use]
+extern crate ifmt;
+
 /// J-Link GDB Server and RTXv5 c bindings.
 mod bindings;
 
@@ -8,6 +14,11 @@ mod api;
 
 /// Custom allocator that utilizes the GDB Server API for memory allocation.
 mod allocator;
+
+/// Custom logger that logs through the GDB Server.
+#[macro_use]
+extern crate log;
+mod gdb_logger;
 
 use bindings::jlink::{GDB_API as GdbApi, RTOS_SYMBOLS as RtosSymbols};
 use std::os::raw::{c_char, c_int, c_uint};
@@ -72,6 +83,13 @@ pub extern "C" fn RTOS_Init(p_api: *const GdbApi, core: c_uint) -> c_int {
         Err(_) => return 0,
         _ => (),
     };
+
+    match gdb_logger::init_with_level(log::Level::Info) {
+        Err(_) => return 0,
+        _ => (),
+    };
+
+    info!("Initializing RTX Plugin!");
 
     match core {
         bindings::jlink::JLINK_CORE_CORTEX_M0
