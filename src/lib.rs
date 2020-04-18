@@ -35,18 +35,19 @@ static mut RTOS_SYMBOLS_ARR: [RtosSymbols; 2] = [
 /// Returns the RTOS plugin version.
 ///
 /// # Return value
-/// The plugin version number as unsigned integer: 100 * [major] + 10 * [minor] + [patch].
+/// The plugin version number as unsigned integer: `(100 * [major]) + (10 * [minor]) + [patch]`.
 
 /// # Notes:
-/// Will be called before any other function. The J-Link GDB server only checks the RTOS plugin’s major version number.
+/// * __Will be called before any other function.__
+/// * The J-Link GDB server only checks the RTOS plugin’s major version number.
 /// The minor version number is freely choosable, it is printed in the GDB server’s log file but it is not evaluated.
 #[no_mangle]
 pub extern "C" fn RTOS_GetVersion() -> c_uint {
-    const MAJOR: c_uint = pkg_version::pkg_version_major!();
-    const MINOR: c_uint = pkg_version::pkg_version_minor!();
-    const PATCH: c_uint = pkg_version::pkg_version_patch!();
+    let major: c_uint = pkg_version::pkg_version_major!();
+    let minor: c_uint = pkg_version::pkg_version_minor!();
+    let patch: c_uint = pkg_version::pkg_version_patch!();
 
-    (MAJOR * 100) + (MINOR * 10) + (PATCH)
+    (major * 100) + (minor * 10) + (patch)
 }
 
 /// Initializes RTOS plug-in for further usage.
