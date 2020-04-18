@@ -67,13 +67,13 @@ pub extern "C" fn RTOS_GetVersion() -> c_uint {
 /// API funtions can be used later by the plug-in to perform special functions like reading or writing to target
 /// memory.
 #[no_mangle]
-pub extern "C" fn RTOS_Init(p_api: *const GdbApi, _core: c_uint) -> c_int {
+pub extern "C" fn RTOS_Init(p_api: *const GdbApi, core: c_uint) -> c_int {
     match api::init(p_api) {
         Err(_) => return 0,
         _ => (),
     };
 
-    match _core {
+    match core {
         bindings::jlink::JLINK_CORE_CORTEX_M0
         | bindings::jlink::JLINK_CORE_CORTEX_M1
         | bindings::jlink::JLINK_CORE_CORTEX_M3
