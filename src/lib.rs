@@ -49,26 +49,36 @@ pub extern "C" fn RTOS_GetVersion() -> c_uint {
     (MAJOR * 100) + (MINOR * 10) + (PATCH)
 }
 
-/// Returns a person with the name given them
+/// Initializes RTOS plug-in for further usage.
 ///
-/// # Arguments
+/// # Parameters
 ///
-/// * `name` - A string slice that holds the name of the person
+/// * `pAPI` - Pointer to API functions table.
+/// * `core` - JLINK_CORE_# constant identifying the target’s core.
 ///
-/// # Example
-///
-/// ```
-/// // You can have rust code between fences inside the comments
-/// // If you pass --test to Rustdoc, it will even test it for you!
-/// use doc::Person;
-/// let person = Person::new("name");
-/// ```
+/// # Return value:
+/// * `== 0` - Initialization failed.
+/// * `== 1` - Initialized successfully.
+
+/// # Notes:
+/// If the plug-in does not support the CPU architecture, it should return 0.
+/// The pointer to the API functions table should be stored locally.
+/// API funtions can be used later by the plug-in to perform special functions like reading or writing to target
+/// memory.
 #[no_mangle]
 pub extern "C" fn RTOS_Init(p_api: *const GdbApi, _core: c_uint) -> c_int {
     match api::init(p_api) {
         Err(_) => return 0,
         _ => (),
-    }
+    };
+
+    match _core {
+        bindings::jlink::JLINK_CORE_CORTEX_M0
+        | bindings::jlink::JLINK_CORE_CORTEX_M1
+        | bindings::jlink::JLINK_CORE_CORTEX_M3
+        | bindings::jlink::JLINK_CORE_CORTEX_M4 => (),
+        _ => return 0,
+    };
 
     return 1;
 }
