@@ -8,13 +8,16 @@ pub use crate::bindings::jlink::GDB_API as GdbApi;
 pub const OK: i32 = 0;
 pub const ERR: i32 = -1;
 
-macro_rules! ensure_ok {
-    ($op:expr) => {
-        if($op != crate::gdb::api::OK) {
+macro_rules! ensure {
+    ($cond:expr) => {
+        if !($cond) {
             return crate::gdb::api::ERR;
         }
     };
 }
+
+/// Only data that is C FFI safe should have this trait.
+pub unsafe trait ReprC {}
 
 /// Pointer to struct holding the API provided by the GDB Server, initialized in `RTOS_Init`.jlink
 /// Must not be changed after that.
@@ -116,13 +119,13 @@ pub fn print_error(s: &str) {
     }
 }
 
-pub fn read_mem(addr: u32, size: usize) -> Result<Vec<u8>, i32> {
-    // Heap allocate empty vector for data
-    let mut buff = vec![0u8; size];
+pub fn read_mem<T:Default + ReprC >(addr: u32) -> Result<T, i32> {
+    let mut buff = T::default();
+    let ptr = &mut buff as *mut T;
 
     unsafe {
         match GDB_API.pfReadMem {
-            Some(f) => match f(addr, buff.as_mut_ptr() as *mut c_char, size as c_uint) {
+            Some(f) => match f(addr, ptr as *mut c_char, std::mem::size_of::<T>() as c_uint) {
                 OK => Ok(buff),
                 e => Err(e),
             },
@@ -173,11 +176,15 @@ pub fn read_u32(addr: u32) -> Result<u32, i32> {
     }
 }
 
-pub unsafe fn write_mem(addr: u32, data: &[u8]) -> Result<(), i32> {
+pub unsafe fn write_mem<T: ReprC>(addr: u32, data: &T) -> Result<(), i32> {
     {
         match GDB_API.pfWriteMem {
             None => Err(ERR),
-            Some(f) => match f(addr, data.as_ptr() as *const c_char, data.len() as c_uint) {
+            Some(f) => match f(
+                addr,
+                data as *const T as *const c_char,
+                std::mem::size_of::<T>() as c_uint,
+            ) {
                 OK => Ok(()),
                 e => Err(e),
             },
