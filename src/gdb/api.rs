@@ -225,12 +225,18 @@ pub fn write_u32(addr: u32, data: u32) {
     }
 }
 
-pub fn read_string(addr: u32, len: usize) -> Result<String, i32> {
-    let mut temp_buff: Vec<u8> = vec![0u8; len];
+pub fn read_string(addr: u32, max_len: usize) -> Result<String, i32> {
+    let mut temp_buff: Vec<u8> = vec![0u8; max_len];
 
     unsafe {
         if let Some(f) = GDB_API.pfReadMem {
-            if GDB_OK != f(addr, temp_buff.as_mut_ptr() as *mut c_char, len as c_uint) {
+            if GDB_OK
+                != f(
+                    addr,
+                    temp_buff.as_mut_ptr() as *mut c_char,
+                    max_len as c_uint,
+                )
+            {
                 return Err(GDB_ERR);
             }
         }
