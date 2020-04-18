@@ -60,7 +60,7 @@ pub extern "C" fn RTOS_GetVersion() -> c_uint {
 /// # Return value:
 /// * `== 0` - Initialization failed.
 /// * `== 1` - Initialized successfully.
-
+///
 /// # Notes:
 /// If the plug-in does not support the CPU architecture, it should return 0.
 /// The pointer to the API functions table should be stored locally.
@@ -85,10 +85,10 @@ pub extern "C" fn RTOS_Init(p_api: *const GdbApi, core: c_uint) -> c_int {
 }
 
 /// Returns a pointer to the RTOS symbol table.
-
+///
 /// # Return value:
 /// Pointer to the RTOS symbol table.
-
+///
 /// # Notes:
 /// The J-Link GDB server tries to find addresses of all of the symbols specified in the RTOS symbol table.
 /// If a symbol is found, its address is written into RTOS_SYMBOLS.address, otherwise NULL is written into the address
