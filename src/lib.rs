@@ -13,7 +13,7 @@ mod bindings;
 mod gdb_api;
 
 /// Custom allocator that utilizes the GDB Server API for memory allocation.
-mod allocator;
+mod gdb_allocator;
 
 /// Custom logger that logs through the GDB Server.
 #[macro_use]
@@ -22,6 +22,11 @@ mod gdb_logger;
 
 use bindings::jlink::{GDB_API as GdbApi, RTOS_SYMBOLS as RtosSymbols};
 use std::os::raw::{c_char, c_int, c_uint};
+
+/* ------------------------------------- Global Config--------------------------------------------------------------- */
+
+#[global_allocator]
+static ALLOCATOR: gdb_allocator::GdbAllocator = gdb_allocator::GdbAllocator;
 
 /* ------------------------------------- Constants ------------------------------------------------------------------ */
 

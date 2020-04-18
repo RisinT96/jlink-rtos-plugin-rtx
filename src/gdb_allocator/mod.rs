@@ -3,7 +3,7 @@ use std::ptr::null_mut;
 
 use crate::gdb_api;
 
-struct GdbAllocator;
+pub struct GdbAllocator;
 
 unsafe impl GlobalAlloc for GdbAllocator {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
@@ -35,6 +35,3 @@ unsafe impl GlobalAlloc for GdbAllocator {
         ptr
     }
 }
-
-#[global_allocator]
-static ALLOCATOR: GdbAllocator = GdbAllocator;
