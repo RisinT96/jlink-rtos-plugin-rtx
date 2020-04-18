@@ -13,6 +13,7 @@ extern crate log;
 /// J-Link GDB Server and RTXv5 c bindings.
 mod bindings;
 use bindings::jlink::RTOS_SYMBOLS as RtosSymbols;
+use bindings::rtos;
 
 /// Module used for safely interacting with the API provided by the J-Link GDB Server.
 #[macro_use]

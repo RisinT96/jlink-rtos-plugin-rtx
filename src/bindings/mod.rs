@@ -1,2 +1,2 @@
 pub mod jlink;
-pub mod rtx;
+pub mod rtos;
