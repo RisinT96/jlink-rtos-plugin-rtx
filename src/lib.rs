@@ -2,6 +2,8 @@
 
 /* ------------------------------------- Crates and Modules  -------------------------------------------------------- */
 
+use std::os::raw::{c_char, c_int, c_uint};
+
 /// For easier log/string creation.
 #[macro_use]
 extern crate ifmt;
@@ -19,8 +21,6 @@ use bindings::rtos;
 #[macro_use]
 mod gdb;
 use gdb::api;
-
-use std::os::raw::{c_char, c_int, c_uint};
 
 /* ------------------------------------- Constants ------------------------------------------------------------------ */
 

@@ -9,9 +9,10 @@ pub const OK: i32 = 0;
 pub const ERR: i32 = -1;
 
 macro_rules! ensure {
-    ($cond:expr) => {
-        if !($cond) {
-            return crate::gdb::api::ERR;
+    ($fun:expr) => {
+        match ($fun) {
+            Ok(v) => v,
+            Err(_) => return crate::gdb::api::ERR,
         }
     };
 }
@@ -119,14 +120,17 @@ pub fn print_error(s: &str) {
     }
 }
 
-pub fn read_mem<T:Default + ReprC >(addr: u32) -> Result<T, i32> {
-    let mut buff = T::default();
-    let ptr = &mut buff as *mut T;
+pub fn read_mem<T>(addr: u32) -> Result<T, i32> {
+    let mut value = std::mem::MaybeUninit::uninit();
 
     unsafe {
         match GDB_API.pfReadMem {
-            Some(f) => match f(addr, ptr as *mut c_char, std::mem::size_of::<T>() as c_uint) {
-                OK => Ok(buff),
+            Some(f) => match f(
+                addr,
+                value.as_mut_ptr() as *mut c_char,
+                std::mem::size_of::<T>() as c_uint,
+            ) {
+                OK => Ok(value.assume_init()),
                 e => Err(e),
             },
             None => Err(ERR),
@@ -176,8 +180,8 @@ pub fn read_u32(addr: u32) -> Result<u32, i32> {
     }
 }
 
-pub unsafe fn write_mem<T: ReprC>(addr: u32, data: &T) -> Result<(), i32> {
-    {
+pub fn write_mem<T>(addr: u32, data: &T) -> Result<(), i32> {
+    unsafe {
         match GDB_API.pfWriteMem {
             None => Err(ERR),
             Some(f) => match f(
@@ -192,8 +196,8 @@ pub unsafe fn write_mem<T: ReprC>(addr: u32, data: &T) -> Result<(), i32> {
     }
 }
 
-pub unsafe fn write_u8(addr: u32, data: u8) {
-    {
+pub fn write_u8(addr: u32, data: u8) {
+    unsafe {
         match GDB_API.pfWriteU8 {
             Some(f) => f(addr, data),
             None => (),
@@ -201,8 +205,8 @@ pub unsafe fn write_u8(addr: u32, data: u8) {
     }
 }
 
-pub unsafe fn write_u16(addr: u32, data: u16) {
-    {
+pub fn write_u16(addr: u32, data: u16) {
+    unsafe {
         match GDB_API.pfWriteU16 {
             Some(f) => f(addr, data),
             None => (),
@@ -210,8 +214,8 @@ pub unsafe fn write_u16(addr: u32, data: u16) {
     }
 }
 
-pub unsafe fn write_u32(addr: u32, data: u32) {
-    {
+pub fn write_u32(addr: u32, data: u32) {
+    unsafe {
         match GDB_API.pfWriteU32 {
             Some(f) => f(addr, data),
             None => (),
