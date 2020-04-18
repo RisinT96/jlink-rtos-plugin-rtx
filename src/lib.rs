@@ -167,11 +167,3 @@ pub extern "C" fn RTOS_SetThreadRegList(_p_hex_reg_list: *mut c_char, _thread_id
 pub extern "C" fn RTOS_UpdateThreads() -> c_int {
     0
 }
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}
