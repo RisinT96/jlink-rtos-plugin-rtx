@@ -9,38 +9,28 @@ mod api;
 /// Custom allocator that utilizes the GDB Server API for memory allocation.
 mod allocator;
 
-/// Crate used for working with static and constant C strings, necessary for requesting symbols from the GDB Server.
-#[macro_use]
-extern crate const_cstr;
-
 use bindings::jlink::{GDB_API as GdbApi, RTOS_SYMBOLS as RtosSymbols};
 use std::os::raw::{c_char, c_int, c_uint};
 
 /* ------------------------------------- Constants ------------------------------------------------------------------ */
 
-const_cstr! {
-    // Symbol for the main OS control block.
-    RTX_INFO_CSTR = "osRtxInfo";
-}
-
-/// Static array of structs, each containing the requested symbol from the GDB server.
-/// When `RTOS_GetSymbols` is called, it fills in the empty pointers and sends the request to the GDB Server.
+/// Symbols we want the GDB Server to find on the debugged device.
 static mut RTOS_SYMBOLS_ARR: [RtosSymbols; 2] = [
-    // osRtxInfo
+    // osRtxInfo - Mandatory Symbol
     RtosSymbols {
-        name: 0 as *const c_char, // Fill with `osRtxInfo`.
-        optional: 0,              // This symbol is mandatory.
-        address: 0,               // This will hold the symbol address.
+        name: b"osRtxInfo\0".as_ptr() as *const c_char,
+        optional: 0,
+        address: 0,
     },
     // End Marker
     RtosSymbols {
-        name: 0 as *const c_char, // Fill with `osRtxInfo`.
-        optional: 0,              // This symbol is mandatory.
-        address: 0,               // This will hold the symbol address.
+        name: std::ptr::null(),
+        optional: 0,
+        address: 0,
     },
 ];
 
-/* ------------------------------------- Constants ------------------------------------------------------------------ */
+/* ------------------------------------- API Implementation --------------------------------------------------------- */
 
 /// Returns the RTOS plugin version.
 ///
@@ -83,12 +73,20 @@ pub extern "C" fn RTOS_Init(p_api: *const GdbApi, _core: c_uint) -> c_int {
     return 1;
 }
 
+/// Returns a pointer to the RTOS symbol table.
+
+/// # Return value:
+/// Pointer to the RTOS symbol table.
+
+/// # Notes:
+/// The J-Link GDB server tries to find addresses of all of the symbols specified in the RTOS symbol table.
+/// If a symbol is found, its address is written into RTOS_SYMBOLS.address, otherwise NULL is written into the address
+/// field.
+/// If any of the symbols, declared as mandatory, is not found, the plug-in is not being used by the GDB server.
+/// It is ensured for the following functions, that every mandatory symbol has a valid address entry.
 #[no_mangle]
 pub extern "C" fn RTOS_GetSymbols() -> *mut RtosSymbols {
-    unsafe {
-        RTOS_SYMBOLS_ARR[0].name = RTX_INFO_CSTR.as_ptr();
-        RTOS_SYMBOLS_ARR.as_mut_ptr()
-    }
+    unsafe { RTOS_SYMBOLS_ARR.as_mut_ptr() }
 }
 
 #[no_mangle]
