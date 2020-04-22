@@ -45,7 +45,7 @@ static mut RTOS_SYMBOLS_ARR: [RtosSymbols; 2] = [
 /// Returns the RTOS plugin version.
 ///
 /// # Return value
-/// The plugin version number as unsigned integer: `(100 * [major]) + (10 * [minor]) + [patch]`.
+/// The plugin version number as unsigned integer: `(100 * [major]) + [patch]`.
 ///
 /// # Notes:
 /// * __Will be called before any other function.__
@@ -53,11 +53,7 @@ static mut RTOS_SYMBOLS_ARR: [RtosSymbols; 2] = [
 /// The minor version number is freely choosable, it is printed in the GDB server’s log file but it is not evaluated.
 #[no_mangle]
 pub extern "C" fn RTOS_GetVersion() -> c_uint {
-    let major: c_uint = pkg_version::pkg_version_major!();
-    let minor: c_uint = pkg_version::pkg_version_minor!();
-    let patch: c_uint = pkg_version::pkg_version_patch!();
-
-    (major * 100) + (minor * 10) + (patch)
+    101
 }
 
 /// Initializes RTOS plug-in for further usage.
