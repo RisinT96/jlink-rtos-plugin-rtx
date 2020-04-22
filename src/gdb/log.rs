@@ -20,13 +20,12 @@ impl log::Log for GdbLogger {
             return;
         }
 
-        let msg = iformat!(record.level() " - " record.args()"\n");
-
         match record.level() {
-            Level::Trace | Level::Info => api::print(&msg),
-            Level::Debug => api::print_debug(&msg),
-            Level::Warn => api::print_warning(&msg),
-            Level::Error => api::print_error(&msg),
+            Level::Trace => api::print(&iformat!("TRACE:   " record.args()"\n")),
+            Level::Info => api::print(&iformat!("INFO:    " record.args()"\n")),
+            Level::Debug => api::print(&iformat!("DEBUG:   " record.args()"\n")),
+            Level::Warn => api::print_warning(&iformat!(record.args()"\n")),
+            Level::Error => api::print_error(&iformat!("  " record.args()"\n")),
         };
     }
 
