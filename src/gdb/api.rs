@@ -1,3 +1,4 @@
+use std::option::Option::None;
 use std::os::raw::{c_char, c_uint, c_void};
 use std::ptr::null_mut;
 
@@ -25,24 +26,27 @@ pub unsafe trait ReprC {}
 /// Pointer to struct holding the API provided by the GDB Server, initialized in `RTOS_Init`.jlink
 /// Must not be changed after that.
 static mut GDB_API: GdbApi = GdbApi {
-    pfFree: ::std::option::Option::None,
-    pfAlloc: ::std::option::Option::None,
-    pfRealloc: ::std::option::Option::None,
-    pfLogOutf: ::std::option::Option::None,
-    pfDebugOutf: ::std::option::Option::None,
-    pfWarnOutf: ::std::option::Option::None,
-    pfErrorOutf: ::std::option::Option::None,
-    pfReadMem: ::std::option::Option::None,
-    pfReadU8: ::std::option::Option::None,
-    pfReadU16: ::std::option::Option::None,
-    pfReadU32: ::std::option::Option::None,
-    pfWriteMem: ::std::option::Option::None,
-    pfWriteU8: ::std::option::Option::None,
-    pfWriteU16: ::std::option::Option::None,
-    pfWriteU32: ::std::option::Option::None,
-    pfLoad16TE: ::std::option::Option::None,
-    pfLoad24TE: ::std::option::Option::None,
-    pfLoad32TE: ::std::option::Option::None,
+    pfFree: None,
+    pfAlloc: None,
+    pfRealloc: None,
+    pfLogOutf: None,
+    pfDebugOutf: None,
+    pfWarnOutf: None,
+    pfErrorOutf: None,
+    pfReadMem: None,
+    pfReadU8: None,
+    pfReadU16: None,
+    pfReadU32: None,
+    pfWriteMem: None,
+    pfWriteU8: None,
+    pfWriteU16: None,
+    pfWriteU32: None,
+    pfLoad16TE: None,
+    pfLoad24TE: None,
+    pfLoad32TE: None,
+    pfReadReg: None,
+    pfWriteReg: None,
+    Dummy: null_mut(),
 };
 
 pub fn init(p_api: *const GdbApi) -> Result<(), ()> {
@@ -145,7 +149,7 @@ pub fn read_u8(addr: u32) -> Result<u8, i32> {
 
     unsafe {
         match GDB_API.pfReadU8 {
-            Some(f) => match f(addr, &mut buff) {
+            Some(f) => match f(addr, &mut buff) as i32 {
                 GDB_OK => Ok(buff),
                 e => Err(e),
             },
@@ -159,7 +163,7 @@ pub fn read_u16(addr: u32) -> Result<u16, i32> {
 
     unsafe {
         match GDB_API.pfReadU16 {
-            Some(f) => match f(addr, &mut buff) {
+            Some(f) => match f(addr, &mut buff) as i32{
                 GDB_OK => Ok(buff),
                 e => Err(e),
             },
@@ -173,7 +177,7 @@ pub fn read_u32(addr: u32) -> Result<u32, i32> {
 
     unsafe {
         match GDB_API.pfReadU32 {
-            Some(f) => match f(addr, &mut buff) {
+            Some(f) => match f(addr, &mut buff) as i32{
                 GDB_OK => Ok(buff),
                 e => Err(e),
             },
