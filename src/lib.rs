@@ -15,7 +15,6 @@ extern crate log;
 /// J-Link GDB Server and RTXv5 c bindings.
 mod bindings;
 use bindings::jlink::RTOS_SYMBOLS as RtosSymbols;
-use bindings::rtos;
 
 /// Module used for safely interacting with the API provided by the J-Link GDB Server.
 #[macro_use]
@@ -95,7 +94,7 @@ pub extern "C" fn RTOS_Init(p_api: *const api::GdbApi, core: c_uint) -> c_int {
 
     info!("Successfully initialized RTX Plugin");
 
-    return 1;
+    1
 }
 
 /// Returns a pointer to the RTOS symbol table.
@@ -129,11 +128,6 @@ pub extern "C" fn RTOS_GetSymbols() -> *mut RtosSymbols {
 ///   be read only when requested.
 #[no_mangle]
 pub extern "C" fn RTOS_UpdateThreads() -> c_int {
-    trace!("RTOS_UpdateThreads");
-    debug!("Reading RTX Control Block");
-    let rtx_info: rtos::osRtxInfo_t =
-        ensure!(api::read_mem(unsafe { RTOS_SYMBOLS_ARR[0].address }));
-
     0
 }
 
@@ -163,12 +157,12 @@ pub extern "C" fn RTOS_GetThreadReg(
     _reg_index: c_uint,
     _thread_id: c_uint,
 ) -> c_int {
-    0
+    -1
 }
 
 #[no_mangle]
 pub extern "C" fn RTOS_GetThreadRegList(_p_hex_reg_list: *mut c_char, _thread_id: c_uint) -> c_int {
-    0
+    -1
 }
 
 #[no_mangle]
@@ -177,10 +171,10 @@ pub extern "C" fn RTOS_SetThreadReg(
     _reg_index: c_uint,
     _thread_id: c_uint,
 ) -> c_int {
-    0
+    -1
 }
 
 #[no_mangle]
 pub extern "C" fn RTOS_SetThreadRegList(_p_hex_reg_list: *mut c_char, _thread_id: c_uint) -> c_int {
-    0
+    -1
 }
