@@ -1,5 +1,7 @@
 //! A logger that prints all messages to the GDB Server.
 
+use chrono::Local;
+
 /// Log crate
 use log::{Level, Metadata, Record, SetLoggerError};
 
@@ -20,13 +22,9 @@ impl log::Log for GdbLogger {
             return;
         }
 
-        match record.level() {
-            Level::Trace => api::print(&iformat!("TRACE:   " record.args()"\n")),
-            Level::Info => api::print(&iformat!("INFO:    " record.args()"\n")),
-            Level::Debug => api::print(&iformat!("DEBUG:   " record.args()"\n")),
-            Level::Warn => api::print_warning(&iformat!(record.args()"\n")),
-            Level::Error => api::print_error(&iformat!("  " record.args()"\n")),
-        };
+        let message = iformat!("[{Local::now().format(\"%Y-%m-%d %H:%M:%S.%3f\")}] {record.level():<5} - {record.args()}\n");
+
+        api::print(&message);
     }
 
     fn flush(&self) {}

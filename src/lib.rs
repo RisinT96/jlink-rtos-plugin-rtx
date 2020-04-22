@@ -7,6 +7,7 @@ use std::os::raw::{c_char, c_int, c_uint};
 /// For easier log/string creation.
 #[macro_use]
 extern crate ifmt;
+extern crate chrono;
 
 /// For custom logger that logs through the GDB Server.
 #[macro_use]
@@ -76,7 +77,7 @@ pub extern "C" fn RTOS_GetVersion() -> c_uint {
 #[no_mangle]
 pub extern "C" fn RTOS_Init(p_api: *const api::GdbApi, core: c_uint) -> c_int {
     // Initialize the GDB Server interface module
-    match gdb::init(p_api, log::Level::Info) {
+    match gdb::init(p_api, log::Level::Trace) {
         Err(_) => return 0,
         _ => (),
     };

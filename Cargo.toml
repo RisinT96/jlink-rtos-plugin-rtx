@@ -9,6 +9,7 @@ pkg-version = '1.0.0'
 log = '0.4.8'
 ifmt = '0.3.0'
 memchr = '2.3.3'
+chrono = '0.4.11'
 
 [build-dependencies]
 bindgen = '0.53.2'
