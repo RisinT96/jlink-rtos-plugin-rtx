@@ -24,6 +24,9 @@ use gdb::api;
 
 /* ------------------------------------- Static State Variables ----------------------------------------------------- */
 
+#[global_allocator]
+static ALLOCATOR: gdb::allocator::GdbAllocator = gdb::allocator::GdbAllocator;
+
 /// Symbols we want the GDB Server to find on the debugged device.
 static mut RTOS_SYMBOLS_ARR: [RtosSymbols; 2] = [
     // osRtxInfo - Mandatory Symbol
