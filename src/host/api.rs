@@ -131,19 +131,16 @@ pub fn print_error(s: &str) {
 pub fn read_mem<T>(addr: u32) -> Result<T, i32> {
     let mut value = std::mem::MaybeUninit::uninit();
 
+    let size = std::mem::size_of::<T>();
     unsafe {
-        match GDB_API.pfReadMem {
-            Some(f) => match f(
-                addr,
-                value.as_mut_ptr() as *mut c_char,
-                std::mem::size_of::<T>() as c_uint,
-            ) {
-                GDB_OK => Ok(value.assume_init()),
-                e => Err(e),
-            },
-            None => Err(GDB_ERR),
+        if let Some(f) = GDB_API.pfReadMem {
+            if f(addr, value.as_mut_ptr() as *mut c_char, size as c_uint) as usize == size {
+                return Ok(value.assume_init());
+            }
         }
     }
+
+    Err(GDB_ERR)
 }
 
 pub fn read_u8(addr: u32) -> Result<u8, i32> {
