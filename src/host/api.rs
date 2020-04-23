@@ -239,7 +239,7 @@ pub fn convert_u16(data: u16) -> Result<u16, i32> {
 
 pub fn convert_u32(data: u32) -> Result<u32, i32> {
     unsafe {
-        match GDB_API.pfLoad16TE {
+        match GDB_API.pfLoad32TE {
             Some(f) => Ok(f(&data as *const u32 as *const u8)),
             None => Err(GDB_ERR),
         }
