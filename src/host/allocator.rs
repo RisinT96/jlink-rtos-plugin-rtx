@@ -3,7 +3,7 @@
 use std::alloc::{GlobalAlloc, Layout};
 use std::ptr::null_mut;
 
-use crate::gdb::api;
+use crate::host::api;
 
 pub struct GdbAllocator;
 

@@ -15,7 +15,7 @@ macro_rules! ensure {
     ($fun:expr) => {
         match ($fun) {
             Ok(v) => v,
-            Err(_) => return crate::gdb::api::GDB_ERR,
+            Err(_) => return crate::host::api::GDB_ERR,
         }
     };
 }
@@ -60,6 +60,8 @@ pub fn init(p_api: *const GdbApi) -> Result<(), ()> {
 
     Ok(())
 }
+
+/* ------------------------------------- GDB Server API Wrappers ---------------------------------------------------- */
 
 pub unsafe fn free(ptr: *mut u8) {
     match GDB_API.pfFree {
@@ -163,7 +165,7 @@ pub fn read_u16(addr: u32) -> Result<u16, i32> {
 
     unsafe {
         match GDB_API.pfReadU16 {
-            Some(f) => match f(addr, &mut buff) as i32{
+            Some(f) => match f(addr, &mut buff) as i32 {
                 GDB_OK => Ok(buff),
                 e => Err(e),
             },
@@ -177,7 +179,7 @@ pub fn read_u32(addr: u32) -> Result<u32, i32> {
 
     unsafe {
         match GDB_API.pfReadU32 {
-            Some(f) => match f(addr, &mut buff) as i32{
+            Some(f) => match f(addr, &mut buff) as i32 {
                 GDB_OK => Ok(buff),
                 e => Err(e),
             },
@@ -228,6 +230,44 @@ pub fn write_u32(addr: u32, data: u32) {
         }
     }
 }
+
+pub fn convert_u16(data: u16) -> Result<u16, i32> {
+    unsafe {
+        match GDB_API.pfLoad16TE {
+            Some(f) => Ok(f(&data as *const u16 as *const u8) as u16),
+            None => Err(GDB_ERR),
+        }
+    }
+}
+
+pub fn convert_u32(data: u32) -> Result<u32, i32> {
+    unsafe {
+        match GDB_API.pfLoad16TE {
+            Some(f) => Ok(f(&data as *const u32 as *const u8)),
+            None => Err(GDB_ERR),
+        }
+    }
+}
+
+pub fn read_reg(reg_index: u32) -> Result<u32, i32> {
+    unsafe {
+        match GDB_API.pfReadReg {
+            Some(f) => Ok(f(reg_index)),
+            None => Err(GDB_ERR),
+        }
+    }
+}
+
+pub fn write_reg(reg_index: u32, data: u32) {
+    unsafe {
+        match GDB_API.pfWriteReg {
+            Some(f) => f(reg_index, data),
+            None => (),
+        }
+    }
+}
+
+/* ------------------------------------- GDB Server API Extension --------------------------------------------------- */
 
 pub fn read_string(addr: u32, max_len: usize) -> Result<String, i32> {
     let mut temp_buff: Vec<u8> = vec![0u8; max_len];

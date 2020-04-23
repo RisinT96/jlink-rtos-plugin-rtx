@@ -6,7 +6,7 @@ use chrono::Local;
 use log::{Level, Metadata, Record, SetLoggerError};
 
 /// GDB Server api.
-use crate::gdb::api;
+use crate::host::api;
 
 struct GdbLogger {
     level: Level,
@@ -33,16 +33,16 @@ impl log::Log for GdbLogger {
 /// Initializes the global logger with a GdbLogger instance with
 /// `max_log_level` set to a specific log level.
 ///
+/// ### Usage
 /// ```
-/// # #[macro_use] extern crate log;
-/// # mod gdb_logger;
-/// #
-/// # fn main() {
-/// gdb_logger::init_with_level(log::Level::Warn).unwrap();
+/// mod host;
 ///
-/// warn!("This is an example message.");
-/// info!("This message will not be logged.");
-/// # }
+/// fn main() {
+///     host::log::init_with_level(log::Level::Warn).unwrap();
+///
+///     warn!("This is an example message.");
+///     info!("This message will not be logged.");
+/// }
 /// ```
 pub fn init_with_level(level: Level) -> Result<(), SetLoggerError> {
     let logger = GdbLogger { level };
@@ -56,14 +56,15 @@ pub fn init_with_level(level: Level) -> Result<(), SetLoggerError> {
 /// Initializes the global logger with a GdbLogger instance with
 /// `max_log_level` set to `LogLevel::Trace`.
 ///
+/// ### Usage
 /// ```
-/// # #[macro_use] extern crate log;
-/// # mod gdb_logger;
-/// #
-/// # fn main() {
-/// gdb_logger::init().unwrap();
-/// warn!("This is an example message.");
-/// # }
+/// mod host;
+///
+/// fn main() {
+///     host::log::init().unwrap();
+///
+///     info!("This is an example message.");
+/// }
 /// ```
 pub fn init() -> Result<(), SetLoggerError> {
     init_with_level(Level::Trace)

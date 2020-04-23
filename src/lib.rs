@@ -4,12 +4,12 @@
 
 use std::os::raw::{c_char, c_int, c_uint};
 
-/// For easier log/string creation.
+/// Easier log/string creation.
 #[macro_use]
 extern crate ifmt;
 extern crate chrono;
 
-/// For custom logger that logs through the GDB Server.
+/// Custom logger that logs through the GDB Server.
 #[macro_use]
 extern crate log;
 
@@ -19,13 +19,13 @@ use bindings::jlink::RTOS_SYMBOLS as RtosSymbols;
 
 /// Module used for safely interacting with the API provided by the J-Link GDB Server.
 #[macro_use]
-mod gdb;
-use gdb::api;
+mod host;
+use host::api;
 
-/* ------------------------------------- Static State Variables ----------------------------------------------------- */
+/* ------------------------------------- Static Variables ----------------------------------------------------------- */
 
 #[global_allocator]
-static ALLOCATOR: gdb::allocator::GdbAllocator = gdb::allocator::GdbAllocator;
+static ALLOCATOR: host::allocator::GdbAllocator = host::allocator::GdbAllocator;
 
 /// Symbols we want the GDB Server to find on the debugged device.
 static mut RTOS_SYMBOLS_ARR: [RtosSymbols; 2] = [
@@ -77,7 +77,7 @@ pub extern "C" fn RTOS_GetVersion() -> c_uint {
 #[no_mangle]
 pub extern "C" fn RTOS_Init(p_api: *const api::GdbApi, core: c_uint) -> c_int {
     // Initialize the GDB Server interface module
-    match gdb::init(p_api, log::Level::Trace) {
+    match host::init(p_api, log::Level::Trace) {
         Err(_) => return 0,
         _ => (),
     };

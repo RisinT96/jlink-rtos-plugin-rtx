@@ -7,7 +7,7 @@ include!(concat!(env!("OUT_DIR"), "/rtx_bindings.rs"));
 
 use std::convert::TryFrom;
 
-use crate::gdb::api;
+use crate::host::api;
 
 #[derive(Debug)]
 pub struct Thread<'a> {
