@@ -1,4 +1,5 @@
 //! Bindings auto generated from RTXv5 headers.
+//! Also helper types/functions/traits.
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
@@ -8,6 +9,8 @@ include!(concat!(env!("OUT_DIR"), "/rtx_bindings.rs"));
 use std::convert::TryFrom;
 
 use crate::host::api;
+
+/* ------------------------------------- Types ---------------------------------------------------------------------- */
 
 #[derive(Debug)]
 pub struct Thread<'a> {
@@ -19,6 +22,8 @@ pub struct Thread<'a> {
     stack_pointer: u32,
     priority: &'a str,
     state: &'a str,
+    pub(in crate::bindings::rtos) thread_next: u32,
+    pub(in crate::bindings::rtos) delay_next: u32,
 }
 
 #[derive(Debug)]
@@ -26,19 +31,31 @@ pub struct RtxInfo<'a> {
     threads: Vec<Thread<'a>>,
 }
 
-impl TryFrom<osRtxThread_t> for Thread<'_> {
-    type Error = i32;
+/* ------------------------------------- Thread Implementations ----------------------------------------------------- */
+impl Thread<'_> {
+    pub fn new(address: u32) -> Result<Thread<'static>, i32> {
+        trace!("Loading Thread Info from {:#X}", address);
 
-    fn try_from(thread_info: osRtxThread_t) -> Result<Self, Self::Error> {
-        let name = api::read_string(thread_info.name as u32, 256)?;
+        let thread_info: osRtxThread_t = api::read_mem(address)?;
+
+        let name_addr = api::convert_u32(thread_info.name as u32)?;
+
+        let mut name = String::new();
+        if (name_addr as *const u32 != std::ptr::null()) {
+            name = api::read_string(name_addr, 256)?;
+        }
 
         Ok(Thread {
             name: name,
+
             id: thread_info.id,
             stack_frame: thread_info.stack_frame,
-            stack_base: thread_info.stack_mem as u32,
-            stack_size: thread_info.stack_size,
-            stack_pointer: thread_info.sp,
+            stack_base: api::convert_u32(thread_info.stack_mem as u32)?,
+            stack_size: api::convert_u32(thread_info.stack_size)?,
+            stack_pointer: api::convert_u32(thread_info.sp)?,
+
+            thread_next: api::convert_u32(thread_info.thread_next as u32)?,
+            delay_next: api::convert_u32(thread_info.delay_next as u32)?,
 
             priority: match thread_info.priority as i32 {
                 osPriority_t_osPriorityNone => "None",
