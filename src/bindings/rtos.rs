@@ -123,3 +123,26 @@ impl Thread<'_> {
         })
     }
 }
+
+impl std::fmt::Display for Thread<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        if (self.name.len() != 0) {
+            write!(
+                f,
+                "{name} <{id:0<3}> [{priority}] ({state})",
+                id = self.id,
+                name = self.name,
+                priority = self.priority,
+                state = self.state
+            )
+        } else {
+            write!(
+                f,
+                "<{id:0<3}> [{priority}] ({state})",
+                id = self.id,
+                priority = self.priority,
+                state = self.state
+            )
+        }
+    }
+}
