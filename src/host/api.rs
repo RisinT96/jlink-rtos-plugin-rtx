@@ -271,12 +271,12 @@ pub fn read_string(addr: u32, max_len: usize) -> Result<String, i32> {
 
     unsafe {
         if let Some(f) = GDB_API.pfReadMem {
-            if GDB_OK
-                != f(
-                    addr,
-                    temp_buff.as_mut_ptr() as *mut c_char,
-                    max_len as c_uint,
-                )
+            if f(
+                addr,
+                temp_buff.as_mut_ptr() as *mut c_char,
+                max_len as c_uint,
+            ) as usize
+                != max_len
             {
                 return Err(GDB_ERR);
             }
@@ -285,8 +285,8 @@ pub fn read_string(addr: u32, max_len: usize) -> Result<String, i32> {
 
     // Find null terminator - '\0'
     if let Some(pos) = memchr::memchr(0, &temp_buff) {
-        if let Ok(v) = std::str::from_utf8(&temp_buff[..=pos]) {
-            return Ok(v.to_owned());
+        if let Ok(string) = std::str::from_utf8(&temp_buff[..pos]) {
+            return Ok(string.to_owned());
         }
     }
 
