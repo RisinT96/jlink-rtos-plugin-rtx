@@ -1,2 +1,4 @@
 pub mod jlink;
-pub mod rtos;
+mod rtos;
+
+pub use rtos::{RtxInfo,Thread};

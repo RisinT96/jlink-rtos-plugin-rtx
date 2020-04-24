@@ -22,10 +22,9 @@ use crate::host::api;
 
 /* ------------------------------------- Types ---------------------------------------------------------------------- */
 
-#[derive(Debug)]
 pub struct Thread {
     name: String,
-    id: u32,
+    pub id: u32,
     stack_frame: u8,
     stack_base: u32,
     stack_size: u32,
@@ -44,9 +43,9 @@ struct ThreadDelayList {
     next_thread_addr: u32,
 }
 
-#[derive(Debug)]
+#[derive(Default)]
 pub struct RtxInfo {
-    threads: Vec<Thread>,
+    pub threads: Vec<Thread>,
 }
 
 /* ------------------------------------- Thread Implementations ----------------------------------------------------- */
@@ -257,21 +256,21 @@ impl RtxInfo {
             rtx_info.thread.run.curr as u32,
         )?)?);
         debug!("Currently running thread: {}", threads[0]);
-        
+
         debug!("Loading ready list threads");
         for thread in
-        ThreadReadyList::new(api::convert_u32(rtx_info.thread.ready.thread_list as u32)?)
+            ThreadReadyList::new(api::convert_u32(rtx_info.thread.ready.thread_list as u32)?)
         {
             debug!("Found thread: {}", thread);
             threads.push(thread);
         }
-        
+
         debug!("Loading delay list threads");
         for thread in ThreadDelayList::new(api::convert_u32(rtx_info.thread.delay_list as u32)?) {
             debug!("Found thread: {}", thread);
             threads.push(thread);
         }
-        
+
         debug!("Loading wait list threads");
         for thread in ThreadDelayList::new(api::convert_u32(rtx_info.thread.wait_list as u32)?) {
             debug!("Found thread: {}", thread);

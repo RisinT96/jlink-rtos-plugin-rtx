@@ -2,6 +2,7 @@
 
 /* ------------------------------------- Crates and Modules  -------------------------------------------------------- */
 
+use std::ffi::CString;
 use std::os::raw::{c_char, c_int, c_uint};
 
 /// Easier log/string creation.
@@ -16,6 +17,7 @@ extern crate log;
 /// J-Link GDB Server and RTXv5 c bindings.
 mod bindings;
 use bindings::jlink::RTOS_SYMBOLS as RtosSymbols;
+use bindings::{RtxInfo, Thread};
 
 /// Module used for safely interacting with the API provided by the J-Link GDB Server.
 #[macro_use]
@@ -42,6 +44,28 @@ static mut RTOS_SYMBOLS_ARR: [RtosSymbols; 2] = [
         address: 0,
     },
 ];
+
+static mut RTX_INFO: Option<RtxInfo> = None;
+
+/* ------------------------------------- Private Helper Functions --------------------------------------------------- */
+fn rtx_info_get() -> Option<&'static RtxInfo> {
+    unsafe { (RTX_INFO).as_ref() }
+}
+
+fn rtx_info_set(rtx_info: RtxInfo) {
+    unsafe { RTX_INFO = Some(rtx_info) };
+}
+
+fn find_thread_by_id(id: u32) -> Result<&'static Thread, i32> {
+    if let Some(rtx_info) = rtx_info_get() {
+        for thread in &rtx_info.threads {
+            if thread.id == id {
+                return Ok(&thread);
+            }
+        }
+    }
+    Err(api::GDB_ERR)
+}
 
 /* ------------------------------------- API Implementation --------------------------------------------------------- */
 
@@ -129,27 +153,70 @@ pub extern "C" fn RTOS_GetSymbols() -> *mut RtosSymbols {
 ///   be read only when requested.
 #[no_mangle]
 pub extern "C" fn RTOS_UpdateThreads() -> c_int {
+    trace!("RTOS_UpdateThreads");
+
+    let rtx_info = ensure!(bindings::RtxInfo::new(unsafe {
+        RTOS_SYMBOLS_ARR[0].address
+    }));
+
+    rtx_info_set(rtx_info);
+
     0
 }
 
 #[no_mangle]
 pub extern "C" fn RTOS_GetNumThreads() -> c_uint {
-    0
+    trace!("RTOS_GetNumThreads");
+
+    if let Some(rtx_info) = rtx_info_get() {
+        rtx_info.threads.len() as u32
+    } else {
+        0
+    }
 }
 
 #[no_mangle]
 pub extern "C" fn RTOS_GetCurrentThreadId() -> c_uint {
-    0
+    trace!("RTOS_GetCurrentThreadId");
+
+    if let Some(rtx_info) = rtx_info_get() {
+        rtx_info.threads[0].id
+    } else {
+        0
+    }
 }
 
 #[no_mangle]
-pub extern "C" fn RTOS_GetThreadId(_n: c_uint) -> c_uint {
-    0
+pub extern "C" fn RTOS_GetThreadId(n: c_uint) -> c_uint {
+    trace!("RTOS_GetThreadId");
+
+    if let Some(rtx_info) = rtx_info_get() {
+        rtx_info.threads[n as usize].id
+    } else {
+        0
+    }
 }
 
 #[no_mangle]
-pub extern "C" fn RTOS_GetThreadDisplay(_p_display: *mut c_char, _thread_id: c_uint) -> c_int {
-    0
+pub extern "C" fn RTOS_GetThreadDisplay(p_display: *mut c_char, thread_id: c_uint) -> c_int {
+    trace!("RTOS_GetThreadDisplay");
+
+    let thread = ensure!(find_thread_by_id(thread_id));
+    let thread_name = thread.to_string();
+    let thread_name_len = thread_name.len();
+
+    let write_len = std::cmp::min(
+        thread_name_len + 1,
+        bindings::jlink::RTOS_PLUGIN_BUF_SIZE_THREAD_DISPLAY as usize,
+    );
+
+    let thread_name_cstr = ensure!(CString::new(thread_name));
+
+    unsafe {
+        std::ptr::copy_nonoverlapping(thread_name_cstr.as_ptr(), p_display, write_len as usize);
+    }
+
+    write_len as i32
 }
 
 #[no_mangle]
