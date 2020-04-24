@@ -6,6 +6,16 @@
 #![allow(unused)]
 include!(concat!(env!("OUT_DIR"), "/rtx_bindings.rs"));
 
+const osThreadState_t_osThreadWaitingDelay: i32 = (osThreadState_t_osThreadBlocked | 0x10i32);
+const osThreadState_t_osThreadWaitingJoin: i32 = (osThreadState_t_osThreadBlocked | 0x20i32);
+const osThreadState_t_osThreadWaitingThreadFlags: i32 = (osThreadState_t_osThreadBlocked | 0x30i32);
+const osThreadState_t_osThreadWaitingEventFlags: i32 = (osThreadState_t_osThreadBlocked | 0x40i32);
+const osThreadState_t_osThreadWaitingMutex: i32 = (osThreadState_t_osThreadBlocked | 0x50i32);
+const osThreadState_t_osThreadWaitingSemaphore: i32 = (osThreadState_t_osThreadBlocked | 0x60i32);
+const osThreadState_t_osThreadWaitingMemoryPool: i32 = (osThreadState_t_osThreadBlocked | 0x70i32);
+const osThreadState_t_osThreadWaitingMessageGet: i32 = (osThreadState_t_osThreadBlocked | 0x80i32);
+const osThreadState_t_osThreadWaitingMessagePut: i32 = (osThreadState_t_osThreadBlocked | 0x90i32);
+
 use std::convert::TryFrom;
 
 use crate::host::api;
@@ -126,6 +136,15 @@ impl Thread {
                 osThreadState_t_osThreadRunning => "Running",
                 osThreadState_t_osThreadBlocked => "Blocked",
                 osThreadState_t_osThreadTerminated => "Terminated",
+                (osThreadState_t_osThreadWaitingDelay) => "Waiting Delay",
+                (osThreadState_t_osThreadWaitingJoin) => "Waiting Join",
+                (osThreadState_t_osThreadWaitingThreadFlags) => "Waiting Thread Flags",
+                (osThreadState_t_osThreadWaitingEventFlags) => "Waiting Event Flags",
+                (osThreadState_t_osThreadWaitingMutex) => "Waiting Mutex",
+                (osThreadState_t_osThreadWaitingSemaphore) => "Waiting Semaphore",
+                (osThreadState_t_osThreadWaitingMemoryPool) => "Waiting Memory Pool",
+                (osThreadState_t_osThreadWaitingMessageGet) => "Waiting Message Get",
+                (osThreadState_t_osThreadWaitingMessagePut) => "Waiting Message Put",
                 _ => "Error",
             },
         })
