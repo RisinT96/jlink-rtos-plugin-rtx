@@ -16,8 +16,7 @@ extern crate log;
 
 /// J-Link GDB Server and RTXv5 c bindings.
 mod bindings;
-use bindings::jlink::RTOS_SYMBOLS as RtosSymbols;
-use bindings::{RtxInfo, Thread};
+use bindings::{RtosSymbols, RtxInfo, Thread};
 
 /// Module used for safely interacting with the API provided by the J-Link GDB Server.
 #[macro_use]
@@ -110,10 +109,10 @@ pub extern "C" fn RTOS_Init(p_api: *const api::GdbApi, core: c_uint) -> c_int {
     info!("Initializing RTX Plugin");
 
     match core {
-        bindings::jlink::JLINK_CORE_CORTEX_M0
-        | bindings::jlink::JLINK_CORE_CORTEX_M1
-        | bindings::jlink::JLINK_CORE_CORTEX_M3
-        | bindings::jlink::JLINK_CORE_CORTEX_M4 => (),
+        bindings::jlink::CORTEX_M0
+        | bindings::jlink::CORTEX_M1
+        | bindings::jlink::CORTEX_M3
+        | bindings::jlink::CORTEX_M4 => (),
         _ => return 0,
     };
 
