@@ -73,7 +73,7 @@ fn find_thread_by_id(id: u32) -> Result<&'static Thread, i32> {
 /// # Return value
 /// The plugin version number as unsigned integer: `(100 * [major]) + [patch]`.
 ///
-/// # Notes:
+/// # Notes
 /// * __Will be called before any other function.__
 /// * The J-Link GDB server only checks the RTOS plugin’s major version number.
 /// The minor version number is freely choosable, it is printed in the GDB server’s log file but it is not evaluated.
@@ -88,11 +88,11 @@ pub extern "C" fn RTOS_GetVersion() -> c_uint {
 /// * `pAPI` - Pointer to API functions table.
 /// * `core` - JLINK_CORE_# constant identifying the target’s core.
 ///
-/// # Return value:
+/// # Return value
 /// * `== 0` - Initialization failed.
 /// * `== 1` - Initialized successfully.
 ///
-/// # Notes:
+/// # Notes
 /// * If the plug-in does not support the CPU architecture, it should return 0.
 /// * The pointer to the API functions table should be stored locally.
 /// * API funtions can be used later by the plug-in to perform special functions like reading or writing to target
@@ -123,10 +123,10 @@ pub extern "C" fn RTOS_Init(p_api: *const api::GdbApi, core: c_uint) -> c_int {
 
 /// Returns a pointer to the RTOS symbol table.
 ///
-/// # Return value:
+/// # Return value
 /// Pointer to the RTOS symbol table.
 ///
-/// # Notes:
+/// # Notes
 /// * The J-Link GDB server tries to find addresses of all of the symbols specified in the RTOS symbol table.
 /// * If a symbol is found, its address is written into RTOS_SYMBOLS.address, otherwise NULL is written into the address
 ///   field.
@@ -141,11 +141,11 @@ pub extern "C" fn RTOS_GetSymbols() -> *mut RtosSymbols {
 
 /// Updates the thread information from the target.
 ///
-/// # Return value:
+/// # Return value
 /// * `== 0` - Updating threads OK.
 /// * `<  0` - Updating threads failed.
 ///
-/// # Notes:
+/// # Notes
 /// * For efficiency purposes, the plug-in should read all required information within this function at once, so later
 ///   requests can be served without further communication to the target.
 /// * IMO - We should only read the minimal data we need to know the state of all the threads, any further data should
@@ -160,9 +160,17 @@ pub extern "C" fn RTOS_UpdateThreads() -> c_int {
 
     rtx_info_set(rtx_info);
 
-    0
+    api::GDB_OK
 }
 
+/// Returns the number of threads.
+///
+/// # Return value
+/// Number of threads.
+///
+/// # Notes
+/// After calling this function, the GDB server will request the thread ID by calling `RTOS_GetThreadId()` for every
+/// thread.
 #[no_mangle]
 pub extern "C" fn RTOS_GetNumThreads() -> c_uint {
     trace!("RTOS_GetNumThreads");
@@ -174,6 +182,10 @@ pub extern "C" fn RTOS_GetNumThreads() -> c_uint {
     }
 }
 
+/// Returns the ID of the currently running thread.
+/// 
+/// # Return value
+/// ID of the currently running thread.
 #[no_mangle]
 pub extern "C" fn RTOS_GetCurrentThreadId() -> c_uint {
     trace!("RTOS_GetCurrentThreadId");
@@ -185,17 +197,41 @@ pub extern "C" fn RTOS_GetCurrentThreadId() -> c_uint {
     }
 }
 
+/// Returns the ID of the thread with index number n.
+/// 
+/// # Parameters
+/// * `index` - Index number of the thread.
+/// 
+/// # Return value
+/// ID of the thread.
+/// 
+/// # Notes
+/// Index numbers for threads run from `0..=[n-1]`, where `n` is the number of threads returned by
+/// `RTOS_GetNumThreads()`.
 #[no_mangle]
-pub extern "C" fn RTOS_GetThreadId(n: c_uint) -> c_uint {
+pub extern "C" fn RTOS_GetThreadId(index: c_uint) -> c_uint {
     trace!("RTOS_GetThreadId");
 
     if let Some(rtx_info) = rtx_info_get() {
-        rtx_info.threads[n as usize].id
+        rtx_info.threads[index as usize].id
     } else {
         0
     }
 }
 
+/// Prints the thread’s name to `p_display`. The name may contain extra information about the thread’s status (running/
+/// suspended, priority, etc.).
+/// 
+/// # Parameters
+/// * `p_display` - Pointer to the string, the name has to be copied to
+/// * `thread_id` - ID of the thread
+/// 
+/// # Return value
+/// Length of the name string.alloc
+/// 
+/// # Notes
+/// The space reserved for the name is 256 bytes (including terminating zero), as defined in
+/// `RTOS_PLUGIN_BUF_SIZE_THREAD_DISPLAY`.
 #[no_mangle]
 pub extern "C" fn RTOS_GetThreadDisplay(p_display: *mut c_char, thread_id: c_uint) -> c_int {
     trace!("RTOS_GetThreadDisplay");
@@ -218,30 +254,76 @@ pub extern "C" fn RTOS_GetThreadDisplay(p_display: *mut c_char, thread_id: c_uin
     write_len as i32
 }
 
+/// Copies the thread’s register value into `p_hex_reg_val` as a HEX string.
+/// If the register value has to be read directly from the CPU, the function must return a value <0, the register value
+/// is then read from the CPU by the GDB server itself.
+/// 
+/// # Parameters
+/// * `p_hex_reg_val` - Pointer to the string, the value has to be copied to.
+/// * `reg_index`     - Index of the register.
+/// * `thread_id`     - ID of the thread.
+/// 
+/// # Return value
+/// * `== 0` - Reading register OK.
+/// * `<  0` - Reading register failed.
 #[no_mangle]
 pub extern "C" fn RTOS_GetThreadReg(
     _p_hex_reg_val: *mut c_char,
     _reg_index: c_uint,
     _thread_id: c_uint,
 ) -> c_int {
-    -1
+    api::GDB_ERR
 }
 
+/// Copies the thread’s general registers' values into `p_hex_reg_list` as a HEX string.
+/// If the register values have to be read directly from the CPU, the function must return a value <0, the register
+/// values are then read from the CPU by the GDB server itself.
+/// 
+/// # Parameters
+/// * `p_hex_reg_list` - Pointer to the string, the values have to be copied to.
+/// * `thread_id`      - ID of the thread.
+/// 
+/// # Return value
+/// * `== 0` - Reading registers OK.
+/// * `<  0` - Reading registers failed.
 #[no_mangle]
 pub extern "C" fn RTOS_GetThreadRegList(_p_hex_reg_list: *mut c_char, _thread_id: c_uint) -> c_int {
-    -1
+    api::GDB_ERR
 }
 
+/// Sets the thread’s register's value to `p_hex_reg_val`, given as a HEX string.
+/// If the register value has to be written directly to the CPU, the function must return a value <0, the register
+/// value is then written to the CPU by the GDB server itself.
+/// 
+/// # Parameters
+/// * `p_hex_reg_val` - Pointer to the string, containing the value to write.
+/// * `reg_index`     - Index of the register.
+/// * `thread_id`     - ID of the thread.
+/// 
+/// # Return value
+/// * `== 0` - Writing register OK.
+/// * `<  0` - Writing register failed.
 #[no_mangle]
 pub extern "C" fn RTOS_SetThreadReg(
     _p_hex_reg_val: *mut c_char,
     _reg_index: c_uint,
     _thread_id: c_uint,
 ) -> c_int {
-    -1
+    api::GDB_ERR
 }
 
+/// Sets the thread’s general registers' values to `p_hex_reg_list`, given as a HEX string.
+/// If the register values have to be written directly to the CPU, the function must return a value <0, the register
+/// values are then written to the CPU by the GDB server itself.
+/// 
+/// # Parameters
+/// * `p_hex_reg_list` - Pointer to the string, containing the values to write.
+/// * `thread_id`      - ID of the thread.
+/// 
+/// # Return value
+/// * `== 0` - Writing registers OK.
+/// * `<  0` - Writing registers failed.
 #[no_mangle]
 pub extern "C" fn RTOS_SetThreadRegList(_p_hex_reg_list: *mut c_char, _thread_id: c_uint) -> c_int {
-    -1
+    api::GDB_ERR
 }
