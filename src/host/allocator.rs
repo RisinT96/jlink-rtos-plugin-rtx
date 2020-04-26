@@ -20,6 +20,7 @@ unsafe impl GlobalAlloc for GdbAllocator {
 
         ptr
     }
+
     unsafe fn dealloc(&self, ptr: *mut u8, _layout: Layout) {
         api::free(ptr);
     }
