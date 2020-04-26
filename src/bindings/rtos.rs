@@ -155,7 +155,7 @@ impl std::fmt::Display for Thread {
         if (self.name.len() != 0) {
             write!(
                 f,
-                "{name} <{id:0<8X}> [{priority}] ({state})",
+                "{name} <{id:#010X}> [{priority}] ({state})",
                 id = self.id,
                 name = self.name,
                 priority = self.priority,
@@ -164,7 +164,7 @@ impl std::fmt::Display for Thread {
         } else {
             write!(
                 f,
-                "<{id:0<8X}> [{priority}] ({state})",
+                "<{id:#010X}> [{priority}] ({state})",
                 id = self.id,
                 priority = self.priority,
                 state = self.state
