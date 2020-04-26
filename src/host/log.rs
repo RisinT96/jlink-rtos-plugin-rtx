@@ -1,4 +1,4 @@
-//! A logger that prints all messages to the GDB Server.
+//! A logger that prints all messages to the J-Link GDB Server.
 
 use chrono::Local;
 

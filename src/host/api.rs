@@ -1,3 +1,5 @@
+//! Wrapper of the API provided by the J-Link GDB Server.
+
 use std::option::Option::None;
 use std::os::raw::{c_char, c_uint, c_void};
 use std::ptr::null_mut;
