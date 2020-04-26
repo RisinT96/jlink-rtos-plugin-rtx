@@ -15,12 +15,16 @@ extern crate log;
 
 /// J-Link GDB Server and RTXv5 c bindings.
 mod bindings;
-use bindings::{RtosSymbols, RtxInfo, Thread};
+use bindings::RtosSymbols;
 
 /// Module used for safely interacting with the API provided by the J-Link GDB Server.
 #[macro_use]
 mod host;
 use host::{api, GdbAllocator};
+
+/// Representation of RTX Objects.
+mod rtx;
+use rtx::{RtxInfo, Thread};
 
 /* ------------------------------------- Static Variables ----------------------------------------------------------- */
 
@@ -153,9 +157,7 @@ pub extern "C" fn RTOS_GetSymbols() -> *mut RtosSymbols {
 pub extern "C" fn RTOS_UpdateThreads() -> c_int {
     trace!("RTOS_UpdateThreads");
 
-    let rtx_info = ensure!(bindings::RtxInfo::new(unsafe {
-        RTOS_SYMBOLS_ARR[0].address
-    }));
+    let rtx_info = ensure!(RtxInfo::new(unsafe { RTOS_SYMBOLS_ARR[0].address }));
 
     rtx_info_set(rtx_info);
 
