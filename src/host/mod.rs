@@ -1,10 +1,12 @@
 #[macro_use]
 pub mod api;
-pub mod log;
-pub mod allocator;
 
+mod allocator;
+mod log;
 
 extern crate log as ext_log;
+
+pub use allocator::GdbAllocator;
 
 use api::GdbApi;
 use ext_log::Level;

@@ -2,7 +2,6 @@
 
 /* ------------------------------------- Crates and Modules  -------------------------------------------------------- */
 
-use std::ffi::CString;
 use std::os::raw::{c_char, c_int, c_uint};
 
 /// Easier log/string creation.
@@ -21,12 +20,12 @@ use bindings::{RtosSymbols, RtxInfo, Thread};
 /// Module used for safely interacting with the API provided by the J-Link GDB Server.
 #[macro_use]
 mod host;
-use host::api;
+use host::{api, GdbAllocator};
 
 /* ------------------------------------- Static Variables ----------------------------------------------------------- */
 
 #[global_allocator]
-static ALLOCATOR: host::allocator::GdbAllocator = host::allocator::GdbAllocator;
+static ALLOCATOR: GdbAllocator = GdbAllocator;
 
 /// Symbols we want the GDB Server to find on the debugged device.
 static mut RTOS_SYMBOLS_ARR: [RtosSymbols; 2] = [
