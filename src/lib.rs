@@ -183,7 +183,7 @@ pub extern "C" fn RTOS_GetNumThreads() -> c_uint {
 }
 
 /// Returns the ID of the currently running thread.
-/// 
+///
 /// # Return value
 /// ID of the currently running thread.
 #[no_mangle]
@@ -198,13 +198,13 @@ pub extern "C" fn RTOS_GetCurrentThreadId() -> c_uint {
 }
 
 /// Returns the ID of the thread with index number n.
-/// 
+///
 /// # Parameters
 /// * `index` - Index number of the thread.
-/// 
+///
 /// # Return value
 /// ID of the thread.
-/// 
+///
 /// # Notes
 /// Index numbers for threads run from `0..=[n-1]`, where `n` is the number of threads returned by
 /// `RTOS_GetNumThreads()`.
@@ -221,14 +221,14 @@ pub extern "C" fn RTOS_GetThreadId(index: c_uint) -> c_uint {
 
 /// Prints the thread’s name to `p_display`. The name may contain extra information about the thread’s status (running/
 /// suspended, priority, etc.).
-/// 
+///
 /// # Parameters
 /// * `p_display` - Pointer to the string, the name has to be copied to
 /// * `thread_id` - ID of the thread
-/// 
+///
 /// # Return value
 /// Length of the name string.alloc
-/// 
+///
 /// # Notes
 /// The space reserved for the name is 256 bytes (including terminating zero), as defined in
 /// `RTOS_PLUGIN_BUF_SIZE_THREAD_DISPLAY`.
@@ -238,31 +238,19 @@ pub extern "C" fn RTOS_GetThreadDisplay(p_display: *mut c_char, thread_id: c_uin
 
     let thread = ensure!(find_thread_by_id(thread_id));
     let thread_name = thread.to_string();
-    let thread_name_len = thread_name.len();
 
-    let write_len = std::cmp::min(
-        thread_name_len + 1,
-        bindings::jlink::RTOS_PLUGIN_BUF_SIZE_THREAD_DISPLAY as usize,
-    );
-
-    let thread_name_cstr = ensure!(CString::new(thread_name));
-
-    unsafe {
-        std::ptr::copy_nonoverlapping(thread_name_cstr.as_ptr(), p_display, write_len as usize);
-    }
-
-    write_len as i32
+    ensure!(api::write_string_to_buff(p_display, &thread_name)) as i32
 }
 
 /// Copies the thread’s register value into `p_hex_reg_val` as a HEX string.
 /// If the register value has to be read directly from the CPU, the function must return a value <0, the register value
 /// is then read from the CPU by the GDB server itself.
-/// 
+///
 /// # Parameters
 /// * `p_hex_reg_val` - Pointer to the string, the value has to be copied to.
 /// * `reg_index`     - Index of the register.
 /// * `thread_id`     - ID of the thread.
-/// 
+///
 /// # Return value
 /// * `== 0` - Reading register OK.
 /// * `<  0` - Reading register failed.
@@ -278,11 +266,11 @@ pub extern "C" fn RTOS_GetThreadReg(
 /// Copies the thread’s general registers' values into `p_hex_reg_list` as a HEX string.
 /// If the register values have to be read directly from the CPU, the function must return a value <0, the register
 /// values are then read from the CPU by the GDB server itself.
-/// 
+///
 /// # Parameters
 /// * `p_hex_reg_list` - Pointer to the string, the values have to be copied to.
 /// * `thread_id`      - ID of the thread.
-/// 
+///
 /// # Return value
 /// * `== 0` - Reading registers OK.
 /// * `<  0` - Reading registers failed.
@@ -294,12 +282,12 @@ pub extern "C" fn RTOS_GetThreadRegList(_p_hex_reg_list: *mut c_char, _thread_id
 /// Sets the thread’s register's value to `p_hex_reg_val`, given as a HEX string.
 /// If the register value has to be written directly to the CPU, the function must return a value <0, the register
 /// value is then written to the CPU by the GDB server itself.
-/// 
+///
 /// # Parameters
 /// * `p_hex_reg_val` - Pointer to the string, containing the value to write.
 /// * `reg_index`     - Index of the register.
 /// * `thread_id`     - ID of the thread.
-/// 
+///
 /// # Return value
 /// * `== 0` - Writing register OK.
 /// * `<  0` - Writing register failed.
@@ -315,11 +303,11 @@ pub extern "C" fn RTOS_SetThreadReg(
 /// Sets the thread’s general registers' values to `p_hex_reg_list`, given as a HEX string.
 /// If the register values have to be written directly to the CPU, the function must return a value <0, the register
 /// values are then written to the CPU by the GDB server itself.
-/// 
+///
 /// # Parameters
 /// * `p_hex_reg_list` - Pointer to the string, containing the values to write.
 /// * `thread_id`      - ID of the thread.
-/// 
+///
 /// # Return value
 /// * `== 0` - Writing registers OK.
 /// * `<  0` - Writing registers failed.

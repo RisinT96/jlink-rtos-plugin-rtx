@@ -284,7 +284,7 @@ pub fn write_reg(reg_index: u32, data: u32) {
     }
 }
 
-/* ------------------------------------- GDB Server API Extension --------------------------------------------------- */
+/* ------------------------------------- GDB Server API Extensions/Helpers ------------------------------------------ */
 
 pub fn read_string(addr: u32, max_len: usize) -> Result<String, i32> {
     if let Ok(buff) = read_mem_by_len(addr, max_len) {
@@ -294,6 +294,25 @@ pub fn read_string(addr: u32, max_len: usize) -> Result<String, i32> {
                 return Ok(string.to_owned());
             }
         }
+    }
+
+    Err(GDB_ERR)
+}
+
+pub fn write_string_to_buff(p_buff: *mut c_char, string: &str) -> Result<usize, i32> {
+    let c_string_size = string.len() + 1;
+
+    if let Ok(c_string) = CString::new(string) {
+        let write_size = std::cmp::min(
+            c_string_size,
+            crate::bindings::jlink::RTOS_PLUGIN_BUF_SIZE_THREAD_DISPLAY as usize,
+        );
+
+        unsafe {
+            std::ptr::copy_nonoverlapping(c_string.as_ptr(), p_buff, write_size);
+        }
+
+        return Ok(write_size);
     }
 
     Err(GDB_ERR)
