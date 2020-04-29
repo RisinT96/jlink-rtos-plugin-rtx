@@ -1,5 +1,7 @@
 //! Wraps the RTXv5 kernel with an easy to use object
 
+use num_traits::FromPrimitive;
+
 use crate::bindings::rtos;
 use crate::bindings::rtos::osRtxInfo;
 use crate::host::api;
@@ -31,8 +33,8 @@ impl RtxInfo {
         let mut threads: Vec<Thread> = Vec::new();
 
         // If we ran before the kernel was even initialized, exit, there are zero threads.
-        match rtx_info.kernel.state as i32 {
-            rtos::osKernelState_t_osKernelInactive | rtos::osKernelState_t_osKernelError => {
+        match FromPrimitive::from_u8(rtx_info.kernel.state) {
+            Some(rtos::OsKernelState::Inactive) | Some(rtos::OsKernelState::Error) => {
                 debug!("RTX Kernel not initialized yet!");
                 return Ok(RtxInfo { threads });
             }

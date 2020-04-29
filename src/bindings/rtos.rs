@@ -1,22 +1,20 @@
 //! Bindings manually generated from RTXv5 headers.
 //! Also helper types/functions/traits.
 
+use num_derive::FromPrimitive;
+use num_traits::FromPrimitive;
+
 /// Kernel state
-pub type OsKernelState = i32;
-#[doc = "< Inactive."]
-pub const osKernelState_t_osKernelInactive: OsKernelState = 0;
-#[doc = "< Ready."]
-pub const osKernelState_t_osKernelReady: OsKernelState = 1;
-#[doc = "< Running."]
-pub const osKernelState_t_osKernelRunning: OsKernelState = 2;
-#[doc = "< Locked."]
-pub const osKernelState_t_osKernelLocked: OsKernelState = 3;
-#[doc = "< Suspended."]
-pub const osKernelState_t_osKernelSuspended: OsKernelState = 4;
-#[doc = "< Error."]
-pub const osKernelState_t_osKernelError: OsKernelState = -1;
-#[doc = "< Prevents enum down-size compiler optimization."]
-pub const osKernelState_t_osKernelReserved: OsKernelState = 2147483647;
+#[derive(FromPrimitive)]
+pub enum OsKernelState {
+    Inactive = 0,
+    Ready = 1,
+    Running = 2,
+    Locked = 3,
+    Suspended = 4,
+    Error = -1,
+    Reserved = 2147483647,
+}
 
 #[doc = " Thread state."]
 pub type OsThreadState = i32;
