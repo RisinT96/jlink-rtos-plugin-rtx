@@ -34,11 +34,14 @@ impl RtxInfo {
 
         // If we ran before the kernel was even initialized, exit, there are zero threads.
         match FromPrimitive::from_u8(rtx_info.kernel.state) {
-            Some(rtos::OsKernelState::Inactive) | Some(rtos::OsKernelState::Error) => {
+            Some(rtos::OsKernelState::Ready)
+            | Some(rtos::OsKernelState::Running)
+            | Some(rtos::OsKernelState::Locked)
+            | Some(rtos::OsKernelState::Suspended) => (),
+            _ => {
                 debug!("RTX Kernel not initialized yet!");
                 return Ok(RtxInfo { threads });
             }
-            _ => (),
         };
 
         debug!("Loading currently running thread");
