@@ -25,16 +25,19 @@ unsafe fn core_set(core: Core) {
 /// Initialize the core submodule.
 pub fn init(core: u32) -> Result<(), i32> {
     match core {
-        jlink::CORTEX_M0 | jlink::CORTEX_M1 | jlink::CORTEX_M3 | jlink::CORTEX_M4 => (),
+        jlink::CORTEX_M0 => info!("Core: Cortex-M0"),
+        jlink::CORTEX_M1 => info!("Core: Cortex-M1"),
+        jlink::CORTEX_M3 => info!("Core: Cortex-M3"),
+        jlink::CORTEX_M4 => info!("Core: Cortex-M4"),
         _ => return Err(api::GDB_ERR),
     };
 
     let has_fpu = find_fpu(core)?;
 
     if has_fpu {
-        info!("FPU found!")
+        info!("FPU: present")
     } else {
-        info!("No FPU found!")
+        info!("FPU: not present")
     }
 
     unsafe {
@@ -79,13 +82,17 @@ fn find_fpu(core: u32) -> Result<bool, i32> {
 
     // Backup original value of CPACR
     let cpacr_orig = api::read_u32(CPACR)?;
-    let cpacr = cpacr_orig & CPACR_CP10_CP11_MASK;
+
+    // Manually enable CPACR FPU bits
+    let cpacr = cpacr_orig | CPACR_CP10_CP11_MASK;
     api::write_u32(CPACR, cpacr);
 
+    // If the target has no FPU, it will reset the bits, read.
     let cpacr = api::read_u32(CPACR)?;
-    api::write_u32(CPACR, cpacr_orig);
-
     let has_fpu = (cpacr & CPACR_CP10_CP11_MASK) != 0;
+
+    // Restore CPACR
+    api::write_u32(CPACR, cpacr_orig);
 
     Ok(has_fpu)
 }

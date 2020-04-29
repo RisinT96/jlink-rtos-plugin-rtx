@@ -58,6 +58,16 @@ fn rtx_info_set(rtx_info: RtxInfo) {
     unsafe { RTX_INFO = Some(rtx_info) };
 }
 
+fn get_current_running_thread() -> Result<&'static Thread, i32> {
+    if let Some(rtx_info) = rtx_info_get() {
+        if rtx_info.threads.len() > 0 {
+            return Ok(&rtx_info.threads[0]);
+        }
+    }
+
+    Err(api::GDB_ERR)
+}
+
 fn find_thread_by_id(id: u32) -> Result<&'static Thread, i32> {
     if let Some(rtx_info) = rtx_info_get() {
         for thread in &rtx_info.threads {
@@ -109,7 +119,7 @@ pub extern "C" fn RTOS_Init(p_api: *const api::GdbApi, core: c_uint) -> c_int {
     };
 
     // Now the underlying systems should be initialized, we can begin work.
-    info!("Initializing RTX Plugin");
+    info!("Initializing RTX Plugin. core: {}", core);
 
     if let Err(_) = device::core::init(core) {
         return 0;
@@ -207,7 +217,7 @@ pub extern "C" fn RTOS_GetCurrentThreadId() -> c_uint {
 /// `RTOS_GetNumThreads()`.
 #[no_mangle]
 pub extern "C" fn RTOS_GetThreadId(index: c_uint) -> c_uint {
-    trace!("RTOS_GetThreadId");
+    trace!("RTOS_GetThreadId. index: {}", index);
 
     if let Some(rtx_info) = rtx_info_get() {
         rtx_info.threads[index as usize].id
@@ -231,7 +241,7 @@ pub extern "C" fn RTOS_GetThreadId(index: c_uint) -> c_uint {
 /// `RTOS_PLUGIN_BUF_SIZE_THREAD_DISPLAY`.
 #[no_mangle]
 pub extern "C" fn RTOS_GetThreadDisplay(p_display: *mut c_char, thread_id: c_uint) -> c_int {
-    trace!("RTOS_GetThreadDisplay");
+    trace!("RTOS_GetThreadDisplay, thread_id: {:#010X}", thread_id);
 
     let thread = ensure!(find_thread_by_id(thread_id));
     let thread_name = thread.to_string();
@@ -253,10 +263,20 @@ pub extern "C" fn RTOS_GetThreadDisplay(p_display: *mut c_char, thread_id: c_uin
 /// * `<  0` - Reading register failed.
 #[no_mangle]
 pub extern "C" fn RTOS_GetThreadReg(
-    _p_hex_reg_val: *mut c_char,
-    _reg_index: c_uint,
-    _thread_id: c_uint,
+    p_hex_reg_val: *mut c_char,
+    reg_index: c_uint,
+    thread_id: c_uint,
 ) -> c_int {
+    trace!(
+        "RTOS_GetThreadReg. reg_index: {}, thread_id {:#010X}",
+        reg_index,
+        thread_id
+    );
+
+    if ensure!(get_current_running_thread()).id == thread_id {
+        return api::GDB_ERR;
+    }
+
     api::GDB_ERR
 }
 
@@ -272,7 +292,13 @@ pub extern "C" fn RTOS_GetThreadReg(
 /// * `== 0` - Reading registers OK.
 /// * `<  0` - Reading registers failed.
 #[no_mangle]
-pub extern "C" fn RTOS_GetThreadRegList(_p_hex_reg_list: *mut c_char, _thread_id: c_uint) -> c_int {
+pub extern "C" fn RTOS_GetThreadRegList(p_hex_reg_list: *mut c_char, thread_id: c_uint) -> c_int {
+    trace!("RTOS_GetThreadRegList. thread_id {:#010X}", thread_id);
+
+    if ensure!(get_current_running_thread()).id == thread_id {
+        return api::GDB_ERR;
+    }
+
     api::GDB_ERR
 }
 
@@ -290,10 +316,20 @@ pub extern "C" fn RTOS_GetThreadRegList(_p_hex_reg_list: *mut c_char, _thread_id
 /// * `<  0` - Writing register failed.
 #[no_mangle]
 pub extern "C" fn RTOS_SetThreadReg(
-    _p_hex_reg_val: *mut c_char,
-    _reg_index: c_uint,
-    _thread_id: c_uint,
+    p_hex_reg_val: *mut c_char,
+    reg_index: c_uint,
+    thread_id: c_uint,
 ) -> c_int {
+    trace!(
+        "RTOS_SetThreadReg. reg_index: {}, thread_id {:#010X}",
+        reg_index,
+        thread_id
+    );
+
+    if ensure!(get_current_running_thread()).id == thread_id {
+        return api::GDB_ERR;
+    }
+
     api::GDB_ERR
 }
 
@@ -309,6 +345,12 @@ pub extern "C" fn RTOS_SetThreadReg(
 /// * `== 0` - Writing registers OK.
 /// * `<  0` - Writing registers failed.
 #[no_mangle]
-pub extern "C" fn RTOS_SetThreadRegList(_p_hex_reg_list: *mut c_char, _thread_id: c_uint) -> c_int {
+pub extern "C" fn RTOS_SetThreadRegList(p_hex_reg_list: *mut c_char, thread_id: c_uint) -> c_int {
+    trace!("RTOS_SetThreadRegList. thread_id {:#010X}", thread_id);
+
+    if ensure!(get_current_running_thread()).id == thread_id {
+        return api::GDB_ERR;
+    }
+
     api::GDB_ERR
 }
