@@ -1,5 +1,5 @@
 use crate::bindings::rtos;
-use crate::bindings::rtos::osRtxThread_t;
+use crate::bindings::rtos::osRtxThread;
 
 use crate::host::api;
 
@@ -30,7 +30,7 @@ impl Thread {
     pub fn new(address: u32) -> Result<Thread, i32> {
         trace!("Loading Thread Info from {:#X}", address);
 
-        let thread_info: osRtxThread_t = api::read_mem(address)?;
+        let thread_info: osRtxThread = api::read_mem(address)?;
 
         let name_addr = api::convert_u32(thread_info.name as u32)?;
 

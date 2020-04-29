@@ -1,7 +1,7 @@
 //! Wraps the RTXv5 kernel with an easy to use object
 
 use crate::bindings::rtos;
-use crate::bindings::rtos::osRtxInfo_t;
+use crate::bindings::rtos::osRtxInfo;
 use crate::host::api;
 
 use crate::device::thread::{Thread, ThreadDelayList, ThreadReadyList};
@@ -15,7 +15,7 @@ pub struct RtxInfo {
 impl RtxInfo {
     pub fn new(address: u32) -> Result<RtxInfo, i32> {
         trace!("Loading RTOS Info from {:#X}", address);
-        let rtx_info: osRtxInfo_t = api::read_mem(address)?;
+        let rtx_info: osRtxInfo = api::read_mem(address)?;
 
         let version = api::convert_u32(rtx_info.version)?;
         let os_id = api::convert_u32(rtx_info.os_id as u32)?;

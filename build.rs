@@ -20,19 +20,4 @@ fn main() {
     jlink_bindings
         .write_to_file(out_path.join("jlink_bindings.rs"))
         .expect("Couldn't write jlink bindings!");
-
-    // RTX API
-    let rtx_header = "c_headers/rtx/rtx_os.h";
-
-    println!("cargo:rerun-if-changed={}", rtx_header);
-
-    let rtx_bindings = bindgen::Builder::default()
-        .header(rtx_header)
-        .parse_callbacks(Box::new(bindgen::CargoCallbacks))
-        .generate()
-        .expect("Unable to generate rtx bindings");
-
-    rtx_bindings
-        .write_to_file(out_path.join("rtx_bindings.rs"))
-        .expect("Couldn't write rtx bindings!");
 }
