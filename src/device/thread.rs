@@ -1,6 +1,5 @@
 use num_traits::FromPrimitive;
 
-use crate::bindings::rtos;
 use crate::bindings::rtos::{OsPriority, OsRtxThread, OsThreadState};
 
 use crate::host::api;

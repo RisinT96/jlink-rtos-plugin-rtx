@@ -4,9 +4,13 @@ use std::option::Option::None;
 use std::os::raw::{c_char, c_uint, c_void};
 use std::ptr::null_mut;
 
-use std::ffi::CString;
+use std::ffi::{CStr, CString};
 
+extern crate hex;
 extern crate memchr;
+extern crate byteorder;
+
+use byteorder::{ByteOrder, NativeEndian};
 
 pub use crate::bindings::jlink::GDB_API as GdbApi;
 
@@ -344,6 +348,26 @@ pub fn write_string_to_buff(p_buff: *mut c_char, string: &str) -> Result<usize, 
         }
 
         return Ok(write_size);
+    }
+
+    Err(GDB_ERR)
+}
+
+pub fn hex_arr_to_vec_u32(hex_arr: *const c_char) -> Result<Vec<u32>, i32> {
+    let c_str: &CStr = unsafe { CStr::from_ptr(hex_arr) };
+
+    if let Ok(bytes) = hex::decode(&c_str.to_bytes()) {
+        let len = bytes.len();
+
+        if len % 4 != 0 {
+            return Err(GDB_ERR);
+        }
+
+        let mut out = vec![0; len / 4];
+
+        NativeEndian::read_u32_into(&bytes, &mut out);
+
+        return Ok(out);
     }
 
     Err(GDB_ERR)
