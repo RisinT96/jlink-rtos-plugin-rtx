@@ -2,7 +2,6 @@
 //! Also helper types/functions/traits.
 
 use num_derive::FromPrimitive;
-use num_traits::FromPrimitive;
 
 /// Kernel state
 #[derive(FromPrimitive)]
@@ -16,149 +15,82 @@ pub enum OsKernelState {
     Reserved = 2147483647,
 }
 
-#[doc = " Thread state."]
-pub type OsThreadState = i32;
-#[doc = "< Inactive."]
-pub const osThreadState_t_osThreadInactive: OsThreadState = 0;
-#[doc = "< Ready."]
-pub const osThreadState_t_osThreadReady: OsThreadState = 1;
-#[doc = "< Running."]
-pub const osThreadState_t_osThreadRunning: OsThreadState = 2;
-#[doc = "< Blocked."]
-pub const osThreadState_t_osThreadBlocked: OsThreadState = 3;
-#[doc = "< Terminated."]
-pub const osThreadState_t_osThreadTerminated: OsThreadState = 4;
-#[doc = "< Error."]
-pub const osThreadState_t_osThreadError: OsThreadState = -1;
-#[doc = "< Prevents enum down-size compiler optimization."]
-pub const osThreadState_t_osThreadReserved: OsThreadState = 2147483647;
-pub const osThreadState_t_osThreadWaitingDelay: OsThreadState =
-    osThreadState_t_osThreadBlocked | 0x10;
-pub const osThreadState_t_osThreadWaitingJoin: OsThreadState =
-    osThreadState_t_osThreadBlocked | 0x20;
-pub const osThreadState_t_osThreadWaitingThreadFlags: OsThreadState =
-    osThreadState_t_osThreadBlocked | 0x30;
-pub const osThreadState_t_osThreadWaitingEventFlags: OsThreadState =
-    osThreadState_t_osThreadBlocked | 0x40;
-pub const osThreadState_t_osThreadWaitingMutex: OsThreadState =
-    osThreadState_t_osThreadBlocked | 0x50;
-pub const osThreadState_t_osThreadWaitingSemaphore: OsThreadState =
-    osThreadState_t_osThreadBlocked | 0x60;
-pub const osThreadState_t_osThreadWaitingMemoryPool: OsThreadState =
-    osThreadState_t_osThreadBlocked | 0x70;
-pub const osThreadState_t_osThreadWaitingMessageGet: OsThreadState =
-    osThreadState_t_osThreadBlocked | 0x80;
-pub const osThreadState_t_osThreadWaitingMessagePut: OsThreadState =
-    osThreadState_t_osThreadBlocked | 0x90;
+#[derive(FromPrimitive)]
+pub enum OsThreadState {
+    Inactive = 0,
+    Ready = 1,
+    Running = 2,
+    Blocked = 3,
+    Terminated = 4,
+    Error = -1,
+    Reserved = 2147483647,
+    WaitingDelay = 3 | 0x10,
+    WaitingJoin = 3 | 0x20,
+    WaitingThreadFlags = 3 | 0x30,
+    WaitingEventFlags = 3 | 0x40,
+    WaitingMutex = 3 | 0x50,
+    WaitingSemaphore = 3 | 0x60,
+    WaitingMemoryPool = 3 | 0x70,
+    WaitingMessageGet = 3 | 0x80,
+    WaitingMessagePut = 3 | 0x90,
+}
 
-#[doc = " Priority values."]
-pub type OsPriority = i32;
-#[doc = "< No priority (not initialized)."]
-pub const osPriority_t_osPriorityNone: OsPriority = 0;
-#[doc = "< Reserved for Idle thread."]
-pub const osPriority_t_osPriorityIdle: OsPriority = 1;
-#[doc = "< Priority: low"]
-pub const osPriority_t_osPriorityLow: OsPriority = 8;
-#[doc = "< Priority: low + 1"]
-pub const osPriority_t_osPriorityLow1: OsPriority = 9;
-#[doc = "< Priority: low + 2"]
-pub const osPriority_t_osPriorityLow2: OsPriority = 10;
-#[doc = "< Priority: low + 3"]
-pub const osPriority_t_osPriorityLow3: OsPriority = 11;
-#[doc = "< Priority: low + 4"]
-pub const osPriority_t_osPriorityLow4: OsPriority = 12;
-#[doc = "< Priority: low + 5"]
-pub const osPriority_t_osPriorityLow5: OsPriority = 13;
-#[doc = "< Priority: low + 6"]
-pub const osPriority_t_osPriorityLow6: OsPriority = 14;
-#[doc = "< Priority: low + 7"]
-pub const osPriority_t_osPriorityLow7: OsPriority = 15;
-#[doc = "< Priority: below normal"]
-pub const osPriority_t_osPriorityBelowNormal: OsPriority = 16;
-#[doc = "< Priority: below normal + 1"]
-pub const osPriority_t_osPriorityBelowNormal1: OsPriority = 17;
-#[doc = "< Priority: below normal + 2"]
-pub const osPriority_t_osPriorityBelowNormal2: OsPriority = 18;
-#[doc = "< Priority: below normal + 3"]
-pub const osPriority_t_osPriorityBelowNormal3: OsPriority = 19;
-#[doc = "< Priority: below normal + 4"]
-pub const osPriority_t_osPriorityBelowNormal4: OsPriority = 20;
-#[doc = "< Priority: below normal + 5"]
-pub const osPriority_t_osPriorityBelowNormal5: OsPriority = 21;
-#[doc = "< Priority: below normal + 6"]
-pub const osPriority_t_osPriorityBelowNormal6: OsPriority = 22;
-#[doc = "< Priority: below normal + 7"]
-pub const osPriority_t_osPriorityBelowNormal7: OsPriority = 23;
-#[doc = "< Priority: normal"]
-pub const osPriority_t_osPriorityNormal: OsPriority = 24;
-#[doc = "< Priority: normal + 1"]
-pub const osPriority_t_osPriorityNormal1: OsPriority = 25;
-#[doc = "< Priority: normal + 2"]
-pub const osPriority_t_osPriorityNormal2: OsPriority = 26;
-#[doc = "< Priority: normal + 3"]
-pub const osPriority_t_osPriorityNormal3: OsPriority = 27;
-#[doc = "< Priority: normal + 4"]
-pub const osPriority_t_osPriorityNormal4: OsPriority = 28;
-#[doc = "< Priority: normal + 5"]
-pub const osPriority_t_osPriorityNormal5: OsPriority = 29;
-#[doc = "< Priority: normal + 6"]
-pub const osPriority_t_osPriorityNormal6: OsPriority = 30;
-#[doc = "< Priority: normal + 7"]
-pub const osPriority_t_osPriorityNormal7: OsPriority = 31;
-#[doc = "< Priority: above normal"]
-pub const osPriority_t_osPriorityAboveNormal: OsPriority = 32;
-#[doc = "< Priority: above normal + 1"]
-pub const osPriority_t_osPriorityAboveNormal1: OsPriority = 33;
-#[doc = "< Priority: above normal + 2"]
-pub const osPriority_t_osPriorityAboveNormal2: OsPriority = 34;
-#[doc = "< Priority: above normal + 3"]
-pub const osPriority_t_osPriorityAboveNormal3: OsPriority = 35;
-#[doc = "< Priority: above normal + 4"]
-pub const osPriority_t_osPriorityAboveNormal4: OsPriority = 36;
-#[doc = "< Priority: above normal + 5"]
-pub const osPriority_t_osPriorityAboveNormal5: OsPriority = 37;
-#[doc = "< Priority: above normal + 6"]
-pub const osPriority_t_osPriorityAboveNormal6: OsPriority = 38;
-#[doc = "< Priority: above normal + 7"]
-pub const osPriority_t_osPriorityAboveNormal7: OsPriority = 39;
-#[doc = "< Priority: high"]
-pub const osPriority_t_osPriorityHigh: OsPriority = 40;
-#[doc = "< Priority: high + 1"]
-pub const osPriority_t_osPriorityHigh1: OsPriority = 41;
-#[doc = "< Priority: high + 2"]
-pub const osPriority_t_osPriorityHigh2: OsPriority = 42;
-#[doc = "< Priority: high + 3"]
-pub const osPriority_t_osPriorityHigh3: OsPriority = 43;
-#[doc = "< Priority: high + 4"]
-pub const osPriority_t_osPriorityHigh4: OsPriority = 44;
-#[doc = "< Priority: high + 5"]
-pub const osPriority_t_osPriorityHigh5: OsPriority = 45;
-#[doc = "< Priority: high + 6"]
-pub const osPriority_t_osPriorityHigh6: OsPriority = 46;
-#[doc = "< Priority: high + 7"]
-pub const osPriority_t_osPriorityHigh7: OsPriority = 47;
-#[doc = "< Priority: realtime"]
-pub const osPriority_t_osPriorityRealtime: OsPriority = 48;
-#[doc = "< Priority: realtime + 1"]
-pub const osPriority_t_osPriorityRealtime1: OsPriority = 49;
-#[doc = "< Priority: realtime + 2"]
-pub const osPriority_t_osPriorityRealtime2: OsPriority = 50;
-#[doc = "< Priority: realtime + 3"]
-pub const osPriority_t_osPriorityRealtime3: OsPriority = 51;
-#[doc = "< Priority: realtime + 4"]
-pub const osPriority_t_osPriorityRealtime4: OsPriority = 52;
-#[doc = "< Priority: realtime + 5"]
-pub const osPriority_t_osPriorityRealtime5: OsPriority = 53;
-#[doc = "< Priority: realtime + 6"]
-pub const osPriority_t_osPriorityRealtime6: OsPriority = 54;
-#[doc = "< Priority: realtime + 7"]
-pub const osPriority_t_osPriorityRealtime7: OsPriority = 55;
-#[doc = "< Reserved for ISR deferred thread."]
-pub const osPriority_t_osPriorityISR: OsPriority = 56;
-#[doc = "< System cannot determine priority or illegal priority."]
-pub const osPriority_t_osPriorityError: OsPriority = -1;
-#[doc = "< Prevents enum down-size compiler optimization."]
-pub const osPriority_t_osPriorityReserved: OsPriority = 2147483647;
+#[derive(FromPrimitive)]
+pub enum OsPriority {
+    None = 0,
+    Idle = 1,
+    Low = 8,
+    Low1 = 9,
+    Low2 = 10,
+    Low3 = 11,
+    Low4 = 12,
+    Low5 = 13,
+    Low6 = 14,
+    Low7 = 15,
+    BelowNormal = 16,
+    BelowNormal1 = 17,
+    BelowNormal2 = 18,
+    BelowNormal3 = 19,
+    BelowNormal4 = 20,
+    BelowNormal5 = 21,
+    BelowNormal6 = 22,
+    BelowNormal7 = 23,
+    Normal = 24,
+    Normal1 = 25,
+    Normal2 = 26,
+    Normal3 = 27,
+    Normal4 = 28,
+    Normal5 = 29,
+    Normal6 = 30,
+    Normal7 = 31,
+    AboveNormal = 32,
+    AboveNormal1 = 33,
+    AboveNormal2 = 34,
+    AboveNormal3 = 35,
+    AboveNormal4 = 36,
+    AboveNormal5 = 37,
+    AboveNormal6 = 38,
+    AboveNormal7 = 39,
+    High = 40,
+    High1 = 41,
+    High2 = 42,
+    High3 = 43,
+    High4 = 44,
+    High5 = 45,
+    High6 = 46,
+    High7 = 47,
+    Realtime = 48,
+    Realtime1 = 49,
+    Realtime2 = 50,
+    Realtime3 = 51,
+    Realtime4 = 52,
+    Realtime5 = 53,
+    Realtime6 = 54,
+    Realtime7 = 55,
+    ISR = 56,
+    Error = -1,
+    Reserved = 2147483647,
+}
 
 /// OS Runtime Information structure
 #[repr(C)]
@@ -280,7 +212,7 @@ pub struct MpiInfo {
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct osRtxThread {
+pub struct OsRtxThread {
     /// Object Identifier
     pub id: u8,
     /// Object State

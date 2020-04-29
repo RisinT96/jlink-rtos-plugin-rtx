@@ -1,5 +1,7 @@
+use num_traits::FromPrimitive;
+
 use crate::bindings::rtos;
-use crate::bindings::rtos::osRtxThread;
+use crate::bindings::rtos::{OsPriority, OsRtxThread, OsThreadState};
 
 use crate::host::api;
 
@@ -30,97 +32,107 @@ impl Thread {
     pub fn new(address: u32) -> Result<Thread, i32> {
         trace!("Loading Thread Info from {:#X}", address);
 
-        let thread_info: osRtxThread = api::read_mem(address)?;
+        let thread_info: OsRtxThread = api::read_mem(address)?;
 
-        let name_addr = api::convert_u32(thread_info.name as u32)?;
+        let name_addr = api::convert_u32(thread_info.name)?;
 
         let mut name = String::new();
-        if name_addr as *const u32 != std::ptr::null() {
+        if name_addr != 0 {
             name = api::read_string(name_addr, 256)?;
         }
+
+        let priority: OsPriority = match FromPrimitive::from_i8(thread_info.priority) {
+            Some(val) => val,
+            _ => return Err(api::GDB_ERR),
+        };
+
+        let state: OsThreadState = match FromPrimitive::from_u8(thread_info.state) {
+            Some(val) => val,
+            _ => return Err(api::GDB_ERR),
+        };
 
         Ok(Thread {
             name: name,
 
             id: address,
             stack_frame: thread_info.stack_frame,
-            stack_base: api::convert_u32(thread_info.stack_mem as u32)?,
+            stack_base: api::convert_u32(thread_info.stack_mem)?,
             stack_size: api::convert_u32(thread_info.stack_size)?,
             stack_pointer: api::convert_u32(thread_info.sp)?,
 
-            thread_next: api::convert_u32(thread_info.thread_next as u32)?,
-            delay_next: api::convert_u32(thread_info.delay_next as u32)?,
+            thread_next: api::convert_u32(thread_info.thread_next)?,
+            delay_next: api::convert_u32(thread_info.delay_next)?,
 
-            priority: match thread_info.priority as i32 {
-                rtos::osPriority_t_osPriorityNone => "None",
-                rtos::osPriority_t_osPriorityIdle => "Idle",
-                rtos::osPriority_t_osPriorityLow => "Low",
-                rtos::osPriority_t_osPriorityLow1 => "Low1",
-                rtos::osPriority_t_osPriorityLow2 => "Low2",
-                rtos::osPriority_t_osPriorityLow3 => "Low3",
-                rtos::osPriority_t_osPriorityLow4 => "Low4",
-                rtos::osPriority_t_osPriorityLow5 => "Low5",
-                rtos::osPriority_t_osPriorityLow6 => "Low6",
-                rtos::osPriority_t_osPriorityLow7 => "Low7",
-                rtos::osPriority_t_osPriorityBelowNormal => "BelowNormal",
-                rtos::osPriority_t_osPriorityBelowNormal1 => "BelowNormal1",
-                rtos::osPriority_t_osPriorityBelowNormal2 => "BelowNormal2",
-                rtos::osPriority_t_osPriorityBelowNormal3 => "BelowNormal3",
-                rtos::osPriority_t_osPriorityBelowNormal4 => "BelowNormal4",
-                rtos::osPriority_t_osPriorityBelowNormal5 => "BelowNormal5",
-                rtos::osPriority_t_osPriorityBelowNormal6 => "BelowNormal6",
-                rtos::osPriority_t_osPriorityBelowNormal7 => "BelowNormal7",
-                rtos::osPriority_t_osPriorityNormal => "Normal",
-                rtos::osPriority_t_osPriorityNormal1 => "Normal1",
-                rtos::osPriority_t_osPriorityNormal2 => "Normal2",
-                rtos::osPriority_t_osPriorityNormal3 => "Normal3",
-                rtos::osPriority_t_osPriorityNormal4 => "Normal4",
-                rtos::osPriority_t_osPriorityNormal5 => "Normal5",
-                rtos::osPriority_t_osPriorityNormal6 => "Normal6",
-                rtos::osPriority_t_osPriorityNormal7 => "Normal7",
-                rtos::osPriority_t_osPriorityAboveNormal => "AboveNormal",
-                rtos::osPriority_t_osPriorityAboveNormal1 => "AboveNormal1",
-                rtos::osPriority_t_osPriorityAboveNormal2 => "AboveNormal2",
-                rtos::osPriority_t_osPriorityAboveNormal3 => "AboveNormal3",
-                rtos::osPriority_t_osPriorityAboveNormal4 => "AboveNormal4",
-                rtos::osPriority_t_osPriorityAboveNormal5 => "AboveNormal5",
-                rtos::osPriority_t_osPriorityAboveNormal6 => "AboveNormal6",
-                rtos::osPriority_t_osPriorityAboveNormal7 => "AboveNormal7",
-                rtos::osPriority_t_osPriorityHigh => "High",
-                rtos::osPriority_t_osPriorityHigh1 => "High1",
-                rtos::osPriority_t_osPriorityHigh2 => "High2",
-                rtos::osPriority_t_osPriorityHigh3 => "High3",
-                rtos::osPriority_t_osPriorityHigh4 => "High4",
-                rtos::osPriority_t_osPriorityHigh5 => "High5",
-                rtos::osPriority_t_osPriorityHigh6 => "High6",
-                rtos::osPriority_t_osPriorityHigh7 => "High7",
-                rtos::osPriority_t_osPriorityRealtime => "Realtime",
-                rtos::osPriority_t_osPriorityRealtime1 => "Realtime1",
-                rtos::osPriority_t_osPriorityRealtime2 => "Realtime2",
-                rtos::osPriority_t_osPriorityRealtime3 => "Realtime3",
-                rtos::osPriority_t_osPriorityRealtime4 => "Realtime4",
-                rtos::osPriority_t_osPriorityRealtime5 => "Realtime5",
-                rtos::osPriority_t_osPriorityRealtime6 => "Realtime6",
-                rtos::osPriority_t_osPriorityRealtime7 => "Realtime7",
-                rtos::osPriority_t_osPriorityISR => "ISR",
+            priority: match priority {
+                OsPriority::None => "None",
+                OsPriority::Idle => "Idle",
+                OsPriority::Low => "Low",
+                OsPriority::Low1 => "Low + 1",
+                OsPriority::Low2 => "Low + 2",
+                OsPriority::Low3 => "Low + 3",
+                OsPriority::Low4 => "Low + 4",
+                OsPriority::Low5 => "Low + 5",
+                OsPriority::Low6 => "Low + 6",
+                OsPriority::Low7 => "Low + 7",
+                OsPriority::BelowNormal => "BelowNormal",
+                OsPriority::BelowNormal1 => "BelowNormal + 1",
+                OsPriority::BelowNormal2 => "BelowNormal + 2",
+                OsPriority::BelowNormal3 => "BelowNormal + 3",
+                OsPriority::BelowNormal4 => "BelowNormal + 4",
+                OsPriority::BelowNormal5 => "BelowNormal + 5",
+                OsPriority::BelowNormal6 => "BelowNormal + 6",
+                OsPriority::BelowNormal7 => "BelowNormal + 7",
+                OsPriority::Normal => "Normal",
+                OsPriority::Normal1 => "Normal + 1",
+                OsPriority::Normal2 => "Normal + 2",
+                OsPriority::Normal3 => "Normal + 3",
+                OsPriority::Normal4 => "Normal + 4",
+                OsPriority::Normal5 => "Normal + 5",
+                OsPriority::Normal6 => "Normal + 6",
+                OsPriority::Normal7 => "Normal + 7",
+                OsPriority::AboveNormal => "AboveNormal",
+                OsPriority::AboveNormal1 => "AboveNormal + 1",
+                OsPriority::AboveNormal2 => "AboveNormal + 2",
+                OsPriority::AboveNormal3 => "AboveNormal + 3",
+                OsPriority::AboveNormal4 => "AboveNormal + 4",
+                OsPriority::AboveNormal5 => "AboveNormal + 5",
+                OsPriority::AboveNormal6 => "AboveNormal + 6",
+                OsPriority::AboveNormal7 => "AboveNormal + 7",
+                OsPriority::High => "High",
+                OsPriority::High1 => "High + 1",
+                OsPriority::High2 => "High + 2",
+                OsPriority::High3 => "High + 3",
+                OsPriority::High4 => "High + 4",
+                OsPriority::High5 => "High + 5",
+                OsPriority::High6 => "High + 6",
+                OsPriority::High7 => "High + 7",
+                OsPriority::Realtime => "Realtime",
+                OsPriority::Realtime1 => "Realtime + 1",
+                OsPriority::Realtime2 => "Realtime + 2",
+                OsPriority::Realtime3 => "Realtime + 3",
+                OsPriority::Realtime4 => "Realtime + 4",
+                OsPriority::Realtime5 => "Realtime + 5",
+                OsPriority::Realtime6 => "Realtime + 6",
+                OsPriority::Realtime7 => "Realtime + 7",
+                OsPriority::ISR => "ISR",
                 _ => "Error",
             },
 
-            state: match thread_info.state as i32 {
-                rtos::osThreadState_t_osThreadInactive => "Inactive",
-                rtos::osThreadState_t_osThreadReady => "Ready",
-                rtos::osThreadState_t_osThreadRunning => "Running",
-                rtos::osThreadState_t_osThreadBlocked => "Blocked",
-                rtos::osThreadState_t_osThreadTerminated => "Terminated",
-                rtos::osThreadState_t_osThreadWaitingDelay => "Waiting Delay",
-                rtos::osThreadState_t_osThreadWaitingJoin => "Waiting Join",
-                rtos::osThreadState_t_osThreadWaitingThreadFlags => "Waiting Thread Flags",
-                rtos::osThreadState_t_osThreadWaitingEventFlags => "Waiting Event Flags",
-                rtos::osThreadState_t_osThreadWaitingMutex => "Waiting Mutex",
-                rtos::osThreadState_t_osThreadWaitingSemaphore => "Waiting Semaphore",
-                rtos::osThreadState_t_osThreadWaitingMemoryPool => "Waiting Memory Pool",
-                rtos::osThreadState_t_osThreadWaitingMessageGet => "Waiting Message Get",
-                rtos::osThreadState_t_osThreadWaitingMessagePut => "Waiting Message Put",
+            state: match state {
+                OsThreadState::Inactive => "Inactive",
+                OsThreadState::Ready => "Ready",
+                OsThreadState::Running => "Running",
+                OsThreadState::Blocked => "Blocked",
+                OsThreadState::Terminated => "Terminated",
+                OsThreadState::WaitingDelay => "Waiting Delay",
+                OsThreadState::WaitingJoin => "Waiting Join",
+                OsThreadState::WaitingThreadFlags => "Waiting Thread Flags",
+                OsThreadState::WaitingEventFlags => "Waiting Event Flags",
+                OsThreadState::WaitingMutex => "Waiting Mutex",
+                OsThreadState::WaitingSemaphore => "Waiting Semaphore",
+                OsThreadState::WaitingMemoryPool => "Waiting Memory Pool",
+                OsThreadState::WaitingMessageGet => "Waiting Message Get",
+                OsThreadState::WaitingMessagePut => "Waiting Message Put",
                 _ => "Error",
             },
         })
