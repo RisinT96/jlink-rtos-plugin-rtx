@@ -12,15 +12,15 @@ pub struct Thread {
     stack_pointer: u32,
     priority: &'static str,
     state: &'static str,
-    pub(in crate::rtx) thread_next: u32,
-    pub(in crate::rtx) delay_next: u32,
+    pub(in crate::device) thread_next: u32,
+    pub(in crate::device) delay_next: u32,
 }
 
-pub(in crate::rtx) struct ThreadReadyList {
+pub(in crate::device) struct ThreadReadyList {
     next_thread_addr: u32,
 }
 
-pub(in crate::rtx) struct ThreadDelayList {
+pub(in crate::device) struct ThreadDelayList {
     next_thread_addr: u32,
 }
 

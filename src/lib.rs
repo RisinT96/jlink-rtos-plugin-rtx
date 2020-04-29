@@ -23,8 +23,8 @@ mod host;
 use host::{api, GdbAllocator};
 
 /// Representation of RTX Objects.
-mod rtx;
-use rtx::{RtxInfo, Thread};
+mod device;
+use device::{RtxInfo, Thread};
 
 /* ------------------------------------- Static Variables ----------------------------------------------------------- */
 
@@ -111,13 +111,9 @@ pub extern "C" fn RTOS_Init(p_api: *const api::GdbApi, core: c_uint) -> c_int {
     // Now the underlying systems should be initialized, we can begin work.
     info!("Initializing RTX Plugin");
 
-    match core {
-        bindings::jlink::CORTEX_M0
-        | bindings::jlink::CORTEX_M1
-        | bindings::jlink::CORTEX_M3
-        | bindings::jlink::CORTEX_M4 => (),
-        _ => return 0,
-    };
+    if let Err(_) = device::core::init(core) {
+        return 0;
+    }
 
     info!("Successfully initialized RTX Plugin");
 

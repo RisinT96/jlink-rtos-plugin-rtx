@@ -4,7 +4,7 @@ use crate::bindings::rtos;
 use crate::bindings::rtos::osRtxInfo_t;
 use crate::host::api;
 
-use crate::rtx::thread::{Thread, ThreadDelayList, ThreadReadyList};
+use crate::device::thread::{Thread, ThreadDelayList, ThreadReadyList};
 
 pub struct RtxInfo {
     pub threads: Vec<Thread>,
