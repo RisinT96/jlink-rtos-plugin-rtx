@@ -125,6 +125,8 @@ pub fn print_error(s: &str) {
 }
 
 pub fn read_mem<T>(addr: u32) -> Result<T, i32> {
+    trace!("read_mem. addr: {}", addr);
+
     if let Some(gdb_api) = gdb_api_get() {
         if let Some(f) = gdb_api.pfReadMem {
             let mut value = std::mem::MaybeUninit::uninit();
@@ -142,6 +144,8 @@ pub fn read_mem<T>(addr: u32) -> Result<T, i32> {
 }
 
 pub fn read_mem_by_len(addr: u32, len: usize) -> Result<Vec<u8>, i32> {
+    trace!("read_mem_by_len. addr: {}, len: {}", addr, len);
+
     if let Some(gdb_api) = gdb_api_get() {
         if let Some(f) = gdb_api.pfReadMem {
             let mut buff: Vec<u8> = vec![0u8; len];
@@ -156,6 +160,8 @@ pub fn read_mem_by_len(addr: u32, len: usize) -> Result<Vec<u8>, i32> {
 }
 
 pub fn read_u8(addr: u32) -> Result<u8, i32> {
+    trace!("read_u8. addr: {}", addr);
+
     if let Some(gdb_api) = gdb_api_get() {
         if let Some(f) = gdb_api.pfReadU8 {
             let mut buff: u8 = 0;
@@ -170,6 +176,8 @@ pub fn read_u8(addr: u32) -> Result<u8, i32> {
 }
 
 pub fn read_u16(addr: u32) -> Result<u16, i32> {
+    trace!("read_u16. addr: {}", addr);
+
     if let Some(gdb_api) = gdb_api_get() {
         if let Some(f) = gdb_api.pfReadU16 {
             let mut buff: u16 = 0;
@@ -184,6 +192,8 @@ pub fn read_u16(addr: u32) -> Result<u16, i32> {
 }
 
 pub fn read_u32(addr: u32) -> Result<u32, i32> {
+    trace!("read_u32. addr: {}", addr);
+
     if let Some(gdb_api) = gdb_api_get() {
         if let Some(f) = gdb_api.pfReadU32 {
             let mut buff: u32 = 0;
@@ -197,7 +207,9 @@ pub fn read_u32(addr: u32) -> Result<u32, i32> {
     Err(GDB_ERR)
 }
 
-pub fn write_mem<T>(addr: u32, data: &T) -> Result<(), i32> {
+pub fn write_mem<T: std::fmt::Debug>(addr: u32, data: &T) -> Result<(), i32> {
+    trace!("write_mem. addr: {}, data: {:?}", addr, data);
+
     if let Some(gdb_api) = gdb_api_get() {
         if let Some(f) = gdb_api.pfWriteMem {
             if unsafe {
@@ -217,6 +229,8 @@ pub fn write_mem<T>(addr: u32, data: &T) -> Result<(), i32> {
 }
 
 pub fn write_u8(addr: u32, data: u8) {
+    trace!("write_u8. addr: {}, data: {}", addr, data);
+
     if let Some(gdb_api) = gdb_api_get() {
         if let Some(f) = gdb_api.pfWriteU8 {
             unsafe {
@@ -227,6 +241,8 @@ pub fn write_u8(addr: u32, data: u8) {
 }
 
 pub fn write_u16(addr: u32, data: u16) {
+    trace!("write_u16. addr: {}, data: {}", addr, data);
+
     if let Some(gdb_api) = gdb_api_get() {
         if let Some(f) = gdb_api.pfWriteU16 {
             unsafe {
@@ -237,6 +253,7 @@ pub fn write_u16(addr: u32, data: u16) {
 }
 
 pub fn write_u32(addr: u32, data: u32) {
+    trace!("write_u32. addr: {}, data: {}", addr, data);
     if let Some(gdb_api) = gdb_api_get() {
         if let Some(f) = gdb_api.pfWriteU32 {
             unsafe {
@@ -247,6 +264,8 @@ pub fn write_u32(addr: u32, data: u32) {
 }
 
 pub fn convert_u16(data: u16) -> Result<u16, i32> {
+    trace!("convert_u16. data: {}", data);
+
     if let Some(gdb_api) = gdb_api_get() {
         if let Some(f) = gdb_api.pfLoad16TE {
             return Ok(unsafe { f(&data as *const u16 as *const u8) } as u16);
@@ -257,6 +276,8 @@ pub fn convert_u16(data: u16) -> Result<u16, i32> {
 }
 
 pub fn convert_u32(data: u32) -> Result<u32, i32> {
+    trace!("convert_u32. data: {}", data);
+
     if let Some(gdb_api) = gdb_api_get() {
         if let Some(f) = gdb_api.pfLoad32TE {
             return Ok(unsafe { f(&data as *const u32 as *const u8) } as u32);
@@ -267,6 +288,8 @@ pub fn convert_u32(data: u32) -> Result<u32, i32> {
 }
 
 pub fn read_reg(reg_index: u32) -> Result<u32, i32> {
+    trace!("read_reg. reg_index: {}", reg_index);
+
     if let Some(gdb_api) = gdb_api_get() {
         if let Some(f) = gdb_api.pfReadReg {
             return Ok(unsafe { f(reg_index) });
@@ -277,6 +300,8 @@ pub fn read_reg(reg_index: u32) -> Result<u32, i32> {
 }
 
 pub fn write_reg(reg_index: u32, data: u32) {
+    trace!("write_reg. reg_index: {}, data: {}", reg_index, data);
+
     if let Some(gdb_api) = gdb_api_get() {
         if let Some(f) = gdb_api.pfWriteReg {
             unsafe {
@@ -289,6 +314,8 @@ pub fn write_reg(reg_index: u32, data: u32) {
 /* ------------------------------------- GDB Server API Extensions/Helpers ------------------------------------------ */
 
 pub fn read_string(addr: u32, max_len: usize) -> Result<String, i32> {
+    trace!("read_string. addr: {}, max_len: {}", addr, max_len);
+
     if let Ok(buff) = read_mem_by_len(addr, max_len) {
         // Find null terminator - '\0'
         if let Some(pos) = memchr::memchr(0, &buff) {
@@ -302,6 +329,8 @@ pub fn read_string(addr: u32, max_len: usize) -> Result<String, i32> {
 }
 
 pub fn write_string_to_buff(p_buff: *mut c_char, string: &str) -> Result<usize, i32> {
+    trace!("write_string_to_buff. string: {}", string);
+
     let c_string_size = string.len() + 1;
 
     if let Ok(c_string) = CString::new(string) {
