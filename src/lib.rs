@@ -115,7 +115,7 @@ pub extern "C" fn RTOS_GetVersion() -> c_uint {
 #[no_mangle]
 pub extern "C" fn RTOS_Init(p_api: *const api::GdbApi, core: c_uint) -> c_int {
     // Initialize the GDB Server interface module
-    match host::init(p_api, log::Level::Trace) {
+    match host::init(p_api, log::Level::Debug) {
         Err(_) => return 0,
         _ => (),
     };

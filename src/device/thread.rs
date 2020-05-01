@@ -212,6 +212,11 @@ impl Thread {
 
 impl std::fmt::Display for Thread {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        if let OsThreadState::Running = self.state
+        {
+            write!(f,"► ")?;
+        }
+
         if self.name.len() != 0 {
             write!(
                 f,
