@@ -9,12 +9,10 @@ struct Core {
     has_fpu: bool,
 }
 
-type Reg = u32;
+pub type Reg = u32;
 
-type FloatReg = f32;
+pub type FloatReg = f32;
 
-#[repr(C)]
-#[derive(Copy, Clone)]
 /// General registers of Cortex-M0 to M3 MCUs
 pub struct GeneralRegs {
     r0: Reg,
@@ -42,8 +40,6 @@ pub struct GeneralRegs {
     control: Reg,
 }
 
-#[repr(C)]
-#[derive(Copy, Clone)]
 /// General registers of Cortex-M4 MCUs
 pub struct GeneralRegsFpu {
     general: GeneralRegs,

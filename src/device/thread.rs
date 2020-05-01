@@ -1,8 +1,17 @@
 use num_traits::FromPrimitive;
 
 use crate::bindings::rtos::{OsRtxThread, OsThreadPriority, OsThreadState};
+use crate::device::core::{FloatReg, GeneralRegs, GeneralRegsFpu, Reg};
 
 use crate::host::api;
+
+/* ------------------------------------- Types ---------------------------------------------------------------------- */
+
+pub enum ThreadRegs {
+    Some(GeneralRegs),
+    SomeFpu(GeneralRegsFpu),
+    None,
+}
 
 pub struct Thread {
     name: String,
@@ -15,6 +24,7 @@ pub struct Thread {
     state: OsThreadState,
     pub(in crate::device) thread_next: u32,
     pub(in crate::device) delay_next: u32,
+    regs: ThreadRegs,
 }
 
 pub(in crate::device) struct ThreadReadyList {
@@ -23,6 +33,97 @@ pub(in crate::device) struct ThreadReadyList {
 
 pub(in crate::device) struct ThreadDelayList {
     next_thread_addr: u32,
+}
+
+#[repr(C)]
+#[derive(Copy, Clone)]
+/// Structure of thread's registers when they're stacked on IRQ, the rest are kept in the CPU.
+struct GeneralRegsStackedHw {
+    r0: Reg,
+    r1: Reg,
+    r2: Reg,
+    r3: Reg,
+    r12: Reg,
+    lr: Reg,
+    pc: Reg,
+    xpsr: Reg,
+}
+
+#[repr(C)]
+#[derive(Copy, Clone)]
+/// Structure of thread's registers when they're stacked on context switch.
+struct GeneralRegsStacked {
+    r4: Reg,
+    r5: Reg,
+    r6: Reg,
+    r7: Reg,
+    r8: Reg,
+    r9: Reg,
+    r10: Reg,
+    r11: Reg,
+    hw_stacked: GeneralRegsStackedHw,
+}
+
+#[repr(C)]
+#[derive(Copy, Clone)]
+/// Structure of thread's registers with FPU enabled, when they're stacked on IRQ, the rest are kept in the CPU.
+struct GeneralRegsFpuStackedHw {
+    r0: Reg,
+    r1: Reg,
+    r2: Reg,
+    r3: Reg,
+    r12: Reg,
+    lr: Reg,
+    pc: Reg,
+    xpsr: Reg,
+    s0: FloatReg,
+    s1: FloatReg,
+    s2: FloatReg,
+    s3: FloatReg,
+    s4: FloatReg,
+    s5: FloatReg,
+    s6: FloatReg,
+    s7: FloatReg,
+    s8: FloatReg,
+    s9: FloatReg,
+    s10: FloatReg,
+    s11: FloatReg,
+    s12: FloatReg,
+    s13: FloatReg,
+    s14: FloatReg,
+    s15: FloatReg,
+    fpscr: Reg,
+}
+
+#[repr(C)]
+#[derive(Copy, Clone)]
+/// Structure of thread's registers when they're stacked on context switch.
+struct GeneralRegsFpuStacked {
+    s16: FloatReg,
+    s17: FloatReg,
+    s18: FloatReg,
+    s19: FloatReg,
+    s20: FloatReg,
+    s21: FloatReg,
+    s22: FloatReg,
+    s23: FloatReg,
+    s24: FloatReg,
+    s25: FloatReg,
+    s26: FloatReg,
+    s27: FloatReg,
+    s28: FloatReg,
+    s29: FloatReg,
+    s30: FloatReg,
+    s31: FloatReg,
+    r4: Reg,
+    r5: Reg,
+    r6: Reg,
+    r7: Reg,
+    r8: Reg,
+    r9: Reg,
+    r10: Reg,
+    r11: Reg,
+    hw_stacked: GeneralRegsFpuStackedHw,
 }
 
 /* ------------------------------------- Implementations ------------------------------------------------------------ */
@@ -64,6 +165,7 @@ impl Thread {
 
             priority: priority,
             state: state,
+            regs: ThreadRegs::None,
         })
     }
 }
