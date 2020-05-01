@@ -1,6 +1,6 @@
 use num_traits::FromPrimitive;
 
-use crate::bindings::rtos::{OsPriority, OsRtxThread, OsThreadState};
+use crate::bindings::rtos::{OsRtxThread, OsThreadPriority, OsThreadState};
 
 use crate::host::api;
 
@@ -11,8 +11,8 @@ pub struct Thread {
     stack_base: u32,
     stack_size: u32,
     stack_pointer: u32,
-    priority: &'static str,
-    state: &'static str,
+    priority: OsThreadPriority,
+    state: OsThreadState,
     pub(in crate::device) thread_next: u32,
     pub(in crate::device) delay_next: u32,
 }
@@ -40,7 +40,7 @@ impl Thread {
             name = api::read_string(name_addr, 256)?;
         }
 
-        let priority: OsPriority = match FromPrimitive::from_i8(thread_info.priority) {
+        let priority: OsThreadPriority = match FromPrimitive::from_i8(thread_info.priority) {
             Some(val) => val,
             _ => return Err(api::GDB_ERR),
         };
@@ -62,78 +62,8 @@ impl Thread {
             thread_next: api::convert_u32(thread_info.thread_next)?,
             delay_next: api::convert_u32(thread_info.delay_next)?,
 
-            priority: match priority {
-                OsPriority::None => "None",
-                OsPriority::Idle => "Idle",
-                OsPriority::Low => "Low",
-                OsPriority::Low1 => "Low + 1",
-                OsPriority::Low2 => "Low + 2",
-                OsPriority::Low3 => "Low + 3",
-                OsPriority::Low4 => "Low + 4",
-                OsPriority::Low5 => "Low + 5",
-                OsPriority::Low6 => "Low + 6",
-                OsPriority::Low7 => "Low + 7",
-                OsPriority::BelowNormal => "BelowNormal",
-                OsPriority::BelowNormal1 => "BelowNormal + 1",
-                OsPriority::BelowNormal2 => "BelowNormal + 2",
-                OsPriority::BelowNormal3 => "BelowNormal + 3",
-                OsPriority::BelowNormal4 => "BelowNormal + 4",
-                OsPriority::BelowNormal5 => "BelowNormal + 5",
-                OsPriority::BelowNormal6 => "BelowNormal + 6",
-                OsPriority::BelowNormal7 => "BelowNormal + 7",
-                OsPriority::Normal => "Normal",
-                OsPriority::Normal1 => "Normal + 1",
-                OsPriority::Normal2 => "Normal + 2",
-                OsPriority::Normal3 => "Normal + 3",
-                OsPriority::Normal4 => "Normal + 4",
-                OsPriority::Normal5 => "Normal + 5",
-                OsPriority::Normal6 => "Normal + 6",
-                OsPriority::Normal7 => "Normal + 7",
-                OsPriority::AboveNormal => "AboveNormal",
-                OsPriority::AboveNormal1 => "AboveNormal + 1",
-                OsPriority::AboveNormal2 => "AboveNormal + 2",
-                OsPriority::AboveNormal3 => "AboveNormal + 3",
-                OsPriority::AboveNormal4 => "AboveNormal + 4",
-                OsPriority::AboveNormal5 => "AboveNormal + 5",
-                OsPriority::AboveNormal6 => "AboveNormal + 6",
-                OsPriority::AboveNormal7 => "AboveNormal + 7",
-                OsPriority::High => "High",
-                OsPriority::High1 => "High + 1",
-                OsPriority::High2 => "High + 2",
-                OsPriority::High3 => "High + 3",
-                OsPriority::High4 => "High + 4",
-                OsPriority::High5 => "High + 5",
-                OsPriority::High6 => "High + 6",
-                OsPriority::High7 => "High + 7",
-                OsPriority::Realtime => "Realtime",
-                OsPriority::Realtime1 => "Realtime + 1",
-                OsPriority::Realtime2 => "Realtime + 2",
-                OsPriority::Realtime3 => "Realtime + 3",
-                OsPriority::Realtime4 => "Realtime + 4",
-                OsPriority::Realtime5 => "Realtime + 5",
-                OsPriority::Realtime6 => "Realtime + 6",
-                OsPriority::Realtime7 => "Realtime + 7",
-                OsPriority::ISR => "ISR",
-                _ => "Error",
-            },
-
-            state: match state {
-                OsThreadState::Inactive => "Inactive",
-                OsThreadState::Ready => "Ready",
-                OsThreadState::Running => "Running",
-                OsThreadState::Blocked => "Blocked",
-                OsThreadState::Terminated => "Terminated",
-                OsThreadState::WaitingDelay => "Waiting Delay",
-                OsThreadState::WaitingJoin => "Waiting Join",
-                OsThreadState::WaitingThreadFlags => "Waiting Thread Flags",
-                OsThreadState::WaitingEventFlags => "Waiting Event Flags",
-                OsThreadState::WaitingMutex => "Waiting Mutex",
-                OsThreadState::WaitingSemaphore => "Waiting Semaphore",
-                OsThreadState::WaitingMemoryPool => "Waiting Memory Pool",
-                OsThreadState::WaitingMessageGet => "Waiting Message Get",
-                OsThreadState::WaitingMessagePut => "Waiting Message Put",
-                _ => "Error",
-            },
+            priority: priority,
+            state: state,
         })
     }
 }

@@ -35,8 +35,32 @@ pub enum OsThreadState {
     WaitingMessagePut = 3 | 0x90,
 }
 
+impl std::fmt::Display for OsThreadState {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let name = match self {
+            OsThreadState::Inactive => "Inactive",
+            OsThreadState::Ready => "Ready",
+            OsThreadState::Running => "Running",
+            OsThreadState::Blocked => "Blocked",
+            OsThreadState::Terminated => "Terminated",
+            OsThreadState::WaitingDelay => "Waiting Delay",
+            OsThreadState::WaitingJoin => "Waiting Join",
+            OsThreadState::WaitingThreadFlags => "Waiting Thread Flags",
+            OsThreadState::WaitingEventFlags => "Waiting Event Flags",
+            OsThreadState::WaitingMutex => "Waiting Mutex",
+            OsThreadState::WaitingSemaphore => "Waiting Semaphore",
+            OsThreadState::WaitingMemoryPool => "Waiting Memory Pool",
+            OsThreadState::WaitingMessageGet => "Waiting Message Get",
+            OsThreadState::WaitingMessagePut => "Waiting Message Put",
+            _ => "Error",
+        };
+
+        f.write_str(name)
+    }
+}
+
 #[derive(FromPrimitive)]
-pub enum OsPriority {
+pub enum OsThreadPriority {
     None = 0,
     Idle = 1,
     Low = 8,
@@ -90,6 +114,67 @@ pub enum OsPriority {
     ISR = 56,
     Error = -1,
     Reserved = 2147483647,
+}
+
+impl std::fmt::Display for OsThreadPriority {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let name = match self {
+            OsThreadPriority::None => "None",
+            OsThreadPriority::Idle => "Idle",
+            OsThreadPriority::Low => "Low",
+            OsThreadPriority::Low1 => "Low + 1",
+            OsThreadPriority::Low2 => "Low + 2",
+            OsThreadPriority::Low3 => "Low + 3",
+            OsThreadPriority::Low4 => "Low + 4",
+            OsThreadPriority::Low5 => "Low + 5",
+            OsThreadPriority::Low6 => "Low + 6",
+            OsThreadPriority::Low7 => "Low + 7",
+            OsThreadPriority::BelowNormal => "BelowNormal",
+            OsThreadPriority::BelowNormal1 => "BelowNormal + 1",
+            OsThreadPriority::BelowNormal2 => "BelowNormal + 2",
+            OsThreadPriority::BelowNormal3 => "BelowNormal + 3",
+            OsThreadPriority::BelowNormal4 => "BelowNormal + 4",
+            OsThreadPriority::BelowNormal5 => "BelowNormal + 5",
+            OsThreadPriority::BelowNormal6 => "BelowNormal + 6",
+            OsThreadPriority::BelowNormal7 => "BelowNormal + 7",
+            OsThreadPriority::Normal => "Normal",
+            OsThreadPriority::Normal1 => "Normal + 1",
+            OsThreadPriority::Normal2 => "Normal + 2",
+            OsThreadPriority::Normal3 => "Normal + 3",
+            OsThreadPriority::Normal4 => "Normal + 4",
+            OsThreadPriority::Normal5 => "Normal + 5",
+            OsThreadPriority::Normal6 => "Normal + 6",
+            OsThreadPriority::Normal7 => "Normal + 7",
+            OsThreadPriority::AboveNormal => "AboveNormal",
+            OsThreadPriority::AboveNormal1 => "AboveNormal + 1",
+            OsThreadPriority::AboveNormal2 => "AboveNormal + 2",
+            OsThreadPriority::AboveNormal3 => "AboveNormal + 3",
+            OsThreadPriority::AboveNormal4 => "AboveNormal + 4",
+            OsThreadPriority::AboveNormal5 => "AboveNormal + 5",
+            OsThreadPriority::AboveNormal6 => "AboveNormal + 6",
+            OsThreadPriority::AboveNormal7 => "AboveNormal + 7",
+            OsThreadPriority::High => "High",
+            OsThreadPriority::High1 => "High + 1",
+            OsThreadPriority::High2 => "High + 2",
+            OsThreadPriority::High3 => "High + 3",
+            OsThreadPriority::High4 => "High + 4",
+            OsThreadPriority::High5 => "High + 5",
+            OsThreadPriority::High6 => "High + 6",
+            OsThreadPriority::High7 => "High + 7",
+            OsThreadPriority::Realtime => "Realtime",
+            OsThreadPriority::Realtime1 => "Realtime + 1",
+            OsThreadPriority::Realtime2 => "Realtime + 2",
+            OsThreadPriority::Realtime3 => "Realtime + 3",
+            OsThreadPriority::Realtime4 => "Realtime + 4",
+            OsThreadPriority::Realtime5 => "Realtime + 5",
+            OsThreadPriority::Realtime6 => "Realtime + 6",
+            OsThreadPriority::Realtime7 => "Realtime + 7",
+            OsThreadPriority::ISR => "ISR",
+            _ => "Error",
+        };
+
+        f.write_str(name)
+    }
 }
 
 /// OS Runtime Information structure
