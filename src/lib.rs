@@ -320,6 +320,7 @@ pub extern "C" fn RTOS_SetThreadReg(
     reg_index: c_uint,
     thread_id: c_uint,
 ) -> c_int {
+    //! Unsupported
     let val = ensure!(api::hex_arr_to_vec_u32(p_hex_reg_val));
 
     if val.len() != 1 {
@@ -332,10 +333,6 @@ pub extern "C" fn RTOS_SetThreadReg(
         reg_index,
         thread_id
     );
-
-    if ensure!(get_current_running_thread()).id == thread_id {
-        return api::GDB_ERR;
-    }
 
     api::GDB_ERR
 }
@@ -353,11 +350,8 @@ pub extern "C" fn RTOS_SetThreadReg(
 /// * `<  0` - Writing registers failed.
 #[no_mangle]
 pub extern "C" fn RTOS_SetThreadRegList(p_hex_reg_list: *mut c_char, thread_id: c_uint) -> c_int {
+    //! Unsupported
     trace!("RTOS_SetThreadRegList. thread_id {:#010X}", thread_id);
-
-    if ensure!(get_current_running_thread()).id == thread_id {
-        return api::GDB_ERR;
-    }
 
     api::GDB_ERR
 }
