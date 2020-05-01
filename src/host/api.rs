@@ -17,6 +17,9 @@ pub use crate::bindings::jlink::GDB_API as GdbApi;
 pub const GDB_OK: i32 = 0;
 pub const GDB_ERR: i32 = -1;
 
+/// WTF SEGGER!? just WTF.
+pub const GDB_REG_LIST_LEN: usize = 17;
+
 macro_rules! ensure {
     ($fun:expr) => {
         match ($fun) {
@@ -338,10 +341,7 @@ pub fn write_string_to_buff(p_buff: *mut c_char, string: &str) -> Result<usize, 
     let c_string_size = string.len() + 1;
 
     if let Ok(c_string) = CString::new(string) {
-        let write_size = std::cmp::min(
-            c_string_size,
-            crate::bindings::jlink::RTOS_PLUGIN_BUF_SIZE_THREAD_DISPLAY as usize,
-        );
+        let write_size = c_string_size;
 
         unsafe {
             std::ptr::copy_nonoverlapping(c_string.as_ptr(), p_buff, write_size);
@@ -353,8 +353,9 @@ pub fn write_string_to_buff(p_buff: *mut c_char, string: &str) -> Result<usize, 
     Err(GDB_ERR)
 }
 
-pub fn hex_arr_to_vec_u32(hex_arr: *const c_char) -> Result<Vec<u32>, i32> {
-    let c_str: &CStr = unsafe { CStr::from_ptr(hex_arr) };
+pub fn hex_str_to_vec_u32(hex_str: *const c_char) -> Result<Vec<u32>, i32> {
+    let c_str: &CStr = unsafe { CStr::from_ptr(hex_str) };
+    trace!("hex_arr_to_vec_u32. hex_str: {:?}", &c_str.to_bytes());
 
     if let Ok(bytes) = hex::decode(&c_str.to_bytes()) {
         let len = bytes.len();

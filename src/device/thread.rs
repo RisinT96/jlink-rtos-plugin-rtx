@@ -9,6 +9,7 @@ use crate::host::api;
 
 /* ------------------------------------- Types ---------------------------------------------------------------------- */
 
+#[derive(Debug)]
 pub enum ThreadRegs {
     Some(GeneralRegs),
     SomeFpu(GeneralRegsFpu),
@@ -16,13 +17,13 @@ pub enum ThreadRegs {
 }
 
 pub struct Thread {
-    name: String,
     pub id: u32,
+    pub regs: ThreadRegs,
+    name: String,
     priority: OsThreadPriority,
     state: OsThreadState,
     pub(in crate::device) thread_next: u32,
     pub(in crate::device) delay_next: u32,
-    regs: ThreadRegs,
 }
 
 pub(in crate::device) struct ThreadReadyList {

@@ -2,6 +2,7 @@
 
 /* ------------------------------------- Crates and Modules  -------------------------------------------------------- */
 
+use num_traits::FromPrimitive;
 use std::os::raw::{c_char, c_int, c_uint};
 
 /// Easier log/string creation.
@@ -15,6 +16,7 @@ extern crate log;
 
 /// J-Link GDB Server and RTXv5 c bindings.
 mod bindings;
+use bindings::jlink;
 use bindings::RtosSymbols;
 
 /// Module used for safely interacting with the API provided by the J-Link GDB Server.
@@ -273,8 +275,85 @@ pub extern "C" fn RTOS_GetThreadReg(
         thread_id
     );
 
-    if ensure!(get_current_running_thread()).id == thread_id {
+    let reg: jlink::RegName = match FromPrimitive::from_u32(reg_index) {
+        Some(val) => val,
+        _ => {
+            return api::GDB_ERR;
+        }
+    };
+
+    let thread = ensure!(find_thread_by_id(thread_id));
+
+    if let device::ThreadRegs::None = &thread.regs {
         return api::GDB_ERR;
+    } else if let device::ThreadRegs::Some(regs) = &thread.regs {
+        let val = match reg {
+            jlink::RegName::R0 => regs.r0,
+            jlink::RegName::R1 => regs.r1,
+            jlink::RegName::R2 => regs.r2,
+            jlink::RegName::R3 => regs.r3,
+            jlink::RegName::R4 => regs.r4,
+            jlink::RegName::R5 => regs.r5,
+            jlink::RegName::R6 => regs.r6,
+            jlink::RegName::R7 => regs.r7,
+            jlink::RegName::R8 => regs.r8,
+            jlink::RegName::R9 => regs.r9,
+            jlink::RegName::R10 => regs.r10,
+            jlink::RegName::R11 => regs.r11,
+            jlink::RegName::R12 => regs.r12,
+            jlink::RegName::SP => regs.sp,
+            jlink::RegName::LR => regs.lr,
+            jlink::RegName::PC => regs.pc,
+            jlink::RegName::XPSR => regs.xpsr,
+            jlink::RegName::MSP => regs.msp,
+            jlink::RegName::PSP => regs.psp,
+            jlink::RegName::PRIMASK => regs.primask,
+            jlink::RegName::BASEPRI => regs.basepri,
+            jlink::RegName::FAULTMASK => regs.faultmask,
+            jlink::RegName::CONTROL => regs.control,
+            _ => 0,
+        };
+
+        ensure!(api::write_string_to_buff(
+            p_hex_reg_val,
+            &format!("{:08x}", val)
+        ));
+
+        return api::GDB_OK;
+    } else if let device::ThreadRegs::SomeFpu(regs) = &thread.regs {
+        let val = match reg {
+            jlink::RegName::R0 => regs.general.r0,
+            jlink::RegName::R1 => regs.general.r1,
+            jlink::RegName::R2 => regs.general.r2,
+            jlink::RegName::R3 => regs.general.r3,
+            jlink::RegName::R4 => regs.general.r4,
+            jlink::RegName::R5 => regs.general.r5,
+            jlink::RegName::R6 => regs.general.r6,
+            jlink::RegName::R7 => regs.general.r7,
+            jlink::RegName::R8 => regs.general.r8,
+            jlink::RegName::R9 => regs.general.r9,
+            jlink::RegName::R10 => regs.general.r10,
+            jlink::RegName::R11 => regs.general.r11,
+            jlink::RegName::R12 => regs.general.r12,
+            jlink::RegName::SP => regs.general.sp,
+            jlink::RegName::LR => regs.general.lr,
+            jlink::RegName::PC => regs.general.pc,
+            jlink::RegName::XPSR => regs.general.xpsr,
+            jlink::RegName::MSP => regs.general.msp,
+            jlink::RegName::PSP => regs.general.psp,
+            jlink::RegName::PRIMASK => regs.general.primask,
+            jlink::RegName::BASEPRI => regs.general.basepri,
+            jlink::RegName::FAULTMASK => regs.general.faultmask,
+            jlink::RegName::CONTROL => regs.general.control,
+            _ => 0,
+        };
+
+        trace!("reg value: {}", val);
+
+        ensure!(api::write_string_to_buff(
+            p_hex_reg_val,
+            &format!("{:08x}", val)
+        ));
     }
 
     api::GDB_ERR
@@ -295,8 +374,18 @@ pub extern "C" fn RTOS_GetThreadReg(
 pub extern "C" fn RTOS_GetThreadRegList(p_hex_reg_list: *mut c_char, thread_id: c_uint) -> c_int {
     trace!("RTOS_GetThreadRegList. thread_id {:#010X}", thread_id);
 
-    if ensure!(get_current_running_thread()).id == thread_id {
+    let thread = ensure!(find_thread_by_id(thread_id));
+
+    if let device::ThreadRegs::None = &thread.regs {
         return api::GDB_ERR;
+    } else if let device::ThreadRegs::Some(regs) = &thread.regs {
+        ensure!(api::write_string_to_buff(p_hex_reg_list, &regs.to_string()));
+
+        return api::GDB_OK;
+    } else if let device::ThreadRegs::SomeFpu(regs) = &thread.regs {
+        ensure!(api::write_string_to_buff(p_hex_reg_list, &regs.to_string()));
+
+        return api::GDB_OK;
     }
 
     api::GDB_ERR
@@ -321,7 +410,7 @@ pub extern "C" fn RTOS_SetThreadReg(
     thread_id: c_uint,
 ) -> c_int {
     //! Unsupported
-    let val = ensure!(api::hex_arr_to_vec_u32(p_hex_reg_val));
+    let val = ensure!(api::hex_str_to_vec_u32(p_hex_reg_val));
 
     if val.len() != 1 {
         return api::GDB_ERR;

@@ -1,5 +1,6 @@
 //! Provides information about the state of the CPU of the debugged device.
 
+use byteorder::{ByteOrder, NativeEndian};
 use num_derive::FromPrimitive;
 
 use crate::api;
@@ -11,6 +12,8 @@ struct Core {
     has_fpu: bool,
 }
 
+#[derive(Debug)]
+#[repr(C)]
 /// General registers of Cortex-M0 to M3 MCUs
 pub struct GeneralRegs {
     pub r0: u32,
@@ -38,6 +41,8 @@ pub struct GeneralRegs {
     pub control: u32,
 }
 
+#[derive(Debug)]
+#[repr(C)]
 /// General registers of Cortex-M4 MCUs
 pub struct GeneralRegsFpu {
     pub general: GeneralRegs,
@@ -83,6 +88,38 @@ pub enum HaltReason {
     DwtTrap = (1 << 2),
     VCatch = (1 << 3),
     External = (1 << 4),
+}
+
+/* ------------------------------------- Implementations ------------------------------------------------------------ */
+
+impl std::fmt::Display for GeneralRegs {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let self_words_ptr = (self as *const GeneralRegs) as *const u32;
+        let self_words_slice =
+            unsafe { std::slice::from_raw_parts(self_words_ptr, api::GDB_REG_LIST_LEN) };
+
+        let mut self_bytes_vec = vec![0; api::GDB_REG_LIST_LEN * 4];
+        NativeEndian::write_u32_into(self_words_slice, &mut self_bytes_vec);
+
+        let self_str = hex::encode(self_bytes_vec);
+
+        f.write_str(&self_str)
+    }
+}
+
+impl std::fmt::Display for GeneralRegsFpu {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let self_words_ptr = (self as *const GeneralRegsFpu) as *const u32;
+        let self_words_slice =
+            unsafe { std::slice::from_raw_parts(self_words_ptr, api::GDB_REG_LIST_LEN) };
+
+        let mut self_bytes_vec = vec![0; api::GDB_REG_LIST_LEN * 4];
+        NativeEndian::write_u32_into(self_words_slice, &mut self_bytes_vec);
+
+        let self_str = hex::encode(self_bytes_vec);
+
+        f.write_str(&self_str)
+    }
 }
 
 /* ------------------------------------- State variable and getter/setter ------------------------------------------- */
