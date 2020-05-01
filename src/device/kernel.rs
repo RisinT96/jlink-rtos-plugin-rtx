@@ -45,15 +45,14 @@ impl RtxInfo {
         };
 
         debug!("Loading currently running thread");
-        threads.push(Thread::new(api::convert_u32(
-            rtx_info.thread.run.curr,
-        )?)?);
+        threads.push(Thread::new(
+            api::convert_u32(rtx_info.thread.run.curr)?,
+            true,
+        )?);
         debug!("Currently running thread: {}", threads[0]);
 
         debug!("Loading ready list threads");
-        for thread in
-            ThreadReadyList::new(api::convert_u32(rtx_info.thread.ready.thread_list)?)
-        {
+        for thread in ThreadReadyList::new(api::convert_u32(rtx_info.thread.ready.thread_list)?) {
             debug!("Found thread: {}", thread);
             threads.push(thread);
         }

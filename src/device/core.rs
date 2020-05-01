@@ -1,5 +1,7 @@
 //! Provides information about the state of the CPU of the debugged device.
 
+use num_derive::FromPrimitive;
+
 use crate::api;
 use crate::bindings::jlink;
 
@@ -77,6 +79,15 @@ pub struct GeneralRegsFpu {
     s31: FloatReg,
 }
 
+#[derive(FromPrimitive)]
+pub enum HaltReason {
+    Halted = (1 << 0),
+    Bkpt = (1 << 1),
+    DwtTrap = (1 << 2),
+    VCatch = (1 << 3),
+    External = (1 << 4),
+}
+
 /* ------------------------------------- State variable and getter/setter ------------------------------------------- */
 static mut CORE: Option<Core> = None;
 
@@ -134,6 +145,11 @@ pub fn has_fpu() -> Result<bool, i32> {
     }
 
     Err(api::GDB_ERR)
+}
+
+pub fn get_halt_reason() -> Result<u32, i32> {
+    const DFSR: u32 = 0xE000ED30;
+    Ok(api::read_u32(DFSR)?)
 }
 
 /* ------------------------------------- Private Functions ---------------------------------------------------------- */

@@ -1,6 +1,8 @@
-use num_traits::FromPrimitive;
+use num_traits::{FromPrimitive, ToPrimitive};
 
+use crate::bindings::jlink;
 use crate::bindings::rtos::{OsRtxThread, OsThreadPriority, OsThreadState};
+use crate::device::core;
 use crate::device::core::{FloatReg, GeneralRegs, GeneralRegsFpu, Reg};
 
 use crate::host::api;
@@ -16,10 +18,6 @@ pub enum ThreadRegs {
 pub struct Thread {
     name: String,
     pub id: u32,
-    stack_frame: u8,
-    stack_base: u32,
-    stack_size: u32,
-    stack_pointer: u32,
     priority: OsThreadPriority,
     state: OsThreadState,
     pub(in crate::device) thread_next: u32,
@@ -129,43 +127,84 @@ struct GeneralRegsFpuStacked {
 /* ------------------------------------- Implementations ------------------------------------------------------------ */
 
 impl Thread {
-    pub fn new(address: u32) -> Result<Thread, i32> {
+    pub fn new(address: u32, is_current: bool) -> Result<Thread, i32> {
         trace!("Loading Thread Info from {:#X}", address);
 
         let thread_info: OsRtxThread = api::read_mem(address)?;
 
+        // Load thread name.
         let name_addr = api::convert_u32(thread_info.name)?;
-
         let mut name = String::new();
         if name_addr != 0 {
             name = api::read_string(name_addr, 256)?;
         }
 
+        // Load thread priority.
         let priority: OsThreadPriority = match FromPrimitive::from_i8(thread_info.priority) {
             Some(val) => val,
             _ => return Err(api::GDB_ERR),
         };
 
+        // Load thread state.
         let state: OsThreadState = match FromPrimitive::from_u8(thread_info.state) {
             Some(val) => val,
             _ => return Err(api::GDB_ERR),
         };
 
+        //Load thread registers.
+        let regs;
+
+        let is_in_irq = core::is_in_irq()?;
+        let has_fpu = core::has_fpu()?;
+
+        if is_current && !is_in_irq {
+            /* If the thread is currently running, and not in IRQ, the registers should be read directly from the CPU */
+            regs = ThreadRegs::None;
+        } else if !is_current {
+            /* If the thread is currently not running, the registers should be read from its stack */
+            let sp = api::convert_u32(thread_info.sp)?;
+            let lr = thread_info.stack_frame;
+            let is_fpu_used = has_fpu && ((lr & (1 << 4)) == 0);
+
+            if is_fpu_used {
+                regs = load_thread_registers_fpu_hw(sp);
+            } else {
+                regs = load_thread_registers_hw(sp);
+            }
+        } else {
+            /* If the thread is currently running, but in IRQ, some registers should be read directly from the CPU,
+            while others from the stack */
+
+            // Assume PSP is still valid
+            let sp = api::read_reg(jlink::RegName::PSP as u32)?;
+
+            let lr;
+            if (core::HaltReason::VCatch as u32 & core::get_halt_reason()?) != 0 {
+                // Vector catch just occured, take live LR.
+                lr = api::read_reg(jlink::RegName::LR as u32)? as u8;
+            } else {
+                // Otherwise take LR from previous context switch and hope it's up to date.
+                lr = thread_info.stack_frame;
+            }
+
+            let is_fpu_used = has_fpu && ((lr & (1 << 4)) == 0);
+
+            if is_fpu_used {
+                regs = load_thread_registers_fpu_all(sp);
+            } else {
+                regs = load_thread_registers_all(sp);
+            }
+        }
+
         Ok(Thread {
             name: name,
-
             id: address,
-            stack_frame: thread_info.stack_frame,
-            stack_base: api::convert_u32(thread_info.stack_mem)?,
-            stack_size: api::convert_u32(thread_info.stack_size)?,
-            stack_pointer: api::convert_u32(thread_info.sp)?,
+            priority: priority,
+            state: state,
+            regs: regs,
 
             thread_next: api::convert_u32(thread_info.thread_next)?,
             delay_next: api::convert_u32(thread_info.delay_next)?,
-
-            priority: priority,
-            state: state,
-            regs: ThreadRegs::None,
         })
     }
 }
@@ -217,7 +256,7 @@ impl Iterator for ThreadReadyList {
             return None;
         }
 
-        let thread = Thread::new(self.next_thread_addr).unwrap();
+        let thread = Thread::new(self.next_thread_addr, false).unwrap();
 
         self.next_thread_addr = api::convert_u32(thread.thread_next).unwrap();
 
@@ -233,10 +272,28 @@ impl Iterator for ThreadDelayList {
             return None;
         }
 
-        let thread = Thread::new(self.next_thread_addr).unwrap();
+        let thread = Thread::new(self.next_thread_addr, false).unwrap();
 
         self.next_thread_addr = api::convert_u32(thread.delay_next).unwrap();
 
         return Some(thread);
     }
+}
+
+/* ------------------------------------- Private Functions ---------------------------------------------------------- */
+
+fn load_thread_registers_all(sp: u32) -> ThreadRegs {
+    ThreadRegs::None
+}
+
+fn load_thread_registers_hw(sp: u32) -> ThreadRegs {
+    ThreadRegs::None
+}
+
+fn load_thread_registers_fpu_all(sp: u32) -> ThreadRegs {
+    ThreadRegs::None
+}
+
+fn load_thread_registers_fpu_hw(sp: u32) -> ThreadRegs {
+    ThreadRegs::None
 }
