@@ -20,7 +20,7 @@ impl RtxInfo {
         let rtx_info: osRtxInfo = api::read_mem(address)?;
 
         let version = api::convert_u32(rtx_info.version)?;
-        let os_id = api::convert_u32(rtx_info.os_id as u32)?;
+        let os_id = api::convert_u32(rtx_info.os_id)?;
 
         // Load RTX Name, if possible
         if os_id as *const i8 != std::ptr::null() {
@@ -46,26 +46,26 @@ impl RtxInfo {
 
         debug!("Loading currently running thread");
         threads.push(Thread::new(api::convert_u32(
-            rtx_info.thread.run.curr as u32,
+            rtx_info.thread.run.curr,
         )?)?);
         debug!("Currently running thread: {}", threads[0]);
 
         debug!("Loading ready list threads");
         for thread in
-            ThreadReadyList::new(api::convert_u32(rtx_info.thread.ready.thread_list as u32)?)
+            ThreadReadyList::new(api::convert_u32(rtx_info.thread.ready.thread_list)?)
         {
             debug!("Found thread: {}", thread);
             threads.push(thread);
         }
 
         debug!("Loading delay list threads");
-        for thread in ThreadDelayList::new(api::convert_u32(rtx_info.thread.delay_list as u32)?) {
+        for thread in ThreadDelayList::new(api::convert_u32(rtx_info.thread.delay_list)?) {
             debug!("Found thread: {}", thread);
             threads.push(thread);
         }
 
         debug!("Loading wait list threads");
-        for thread in ThreadDelayList::new(api::convert_u32(rtx_info.thread.wait_list as u32)?) {
+        for thread in ThreadDelayList::new(api::convert_u32(rtx_info.thread.wait_list)?) {
             debug!("Found thread: {}", thread);
             threads.push(thread);
         }

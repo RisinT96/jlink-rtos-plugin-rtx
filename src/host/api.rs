@@ -6,9 +6,9 @@ use std::ptr::null_mut;
 
 use std::ffi::{CStr, CString};
 
+extern crate byteorder;
 extern crate hex;
 extern crate memchr;
-extern crate byteorder;
 
 use byteorder::{ByteOrder, NativeEndian};
 
@@ -284,7 +284,7 @@ pub fn convert_u32(data: u32) -> Result<u32, i32> {
 
     if let Some(gdb_api) = gdb_api_get() {
         if let Some(f) = gdb_api.pfLoad32TE {
-            return Ok(unsafe { f(&data as *const u32 as *const u8) } as u32);
+            return Ok(unsafe { f(&data as *const u32 as *const u8) });
         }
     }
 
