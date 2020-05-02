@@ -5,7 +5,6 @@ authors = ['Tal Risin <risint96@gmail.com>']
 edition = '2018'
 
 [dependencies]
-pkg-version = '1.0.0'
 ifmt = '0.3.0'
 memchr = '2.3.3'
 chrono = '0.4.11'

@@ -59,7 +59,7 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           path: artifacts/
-      - run: zip -r release.zip artifacts/
+      - run: cd artifacts && zip -r ../release.zip * && cd ..
       - uses: softprops/action-gh-release@v1
         with:
           files: release.zip
