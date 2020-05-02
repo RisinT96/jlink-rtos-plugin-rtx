@@ -164,10 +164,9 @@ pub fn init(core: u32) -> Result<(), i32> {
 
 /// Check if the core is in interrupt state
 pub fn is_in_irq() -> Result<bool, i32> {
-    let xpsr =
-        api::read_reg(jlink::RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_XPSR)?;
+    let xpsr = api::read_reg(jlink::Registers::XPSR as u32)?;
 
-    let ipsr = xpsr & 0b111111111;
+    let ipsr = xpsr & 0x1FF;
 
     Ok(ipsr > 0)
 }
