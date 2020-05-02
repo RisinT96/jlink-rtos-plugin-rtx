@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build-win-32:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --target i686-pc-windows-msvc --release
+      - uses: actions/upload-artifact@v2
+        with:
+          path: target/i686-pc-windows-msvc/release/*.dll
+          name: win-32
+  build-linux-32:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --target i686-unknown-linux-gnu --release
+      - uses: actions/upload-artifact@v2
+        with:
+          path: target/i686-unknown-linux-gnu/release/*.so
+          name: linux-32
+  build-linux-64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --target x86_64-unknown-linux-gnu --release
+      - uses: actions/upload-artifact@v2
+        with:
+          path: target/x86_64-unknown-linux-gnu/release/*.so
+          name: linux-64
+  release:
+    needs: [build-win-32, build-linux-32, build-linux-64]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+            path: artifacts/
+      - uses: softprops/action-gh-release@v1
+        with:
+          files: artifacts/*
+

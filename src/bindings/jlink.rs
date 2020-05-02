@@ -6,6 +6,7 @@ use std::os::raw::{c_char, c_int, c_uchar, c_uint, c_ushort, c_void};
 use num_derive::FromPrimitive;
 
 #[derive(FromPrimitive)]
+#[repr(u32)]
 pub enum Core {
     None = 0x00000000,
     Any = 0xFFFFFFFF,
@@ -94,7 +95,7 @@ pub enum Core {
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct RTOS_SYMBOLS {
+pub struct RtosSymbols {
     pub name: *const c_char,
     pub optional: c_int,
     pub address: c_uint,
