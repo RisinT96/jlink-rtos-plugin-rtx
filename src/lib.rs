@@ -94,6 +94,7 @@ fn find_thread_by_id(id: u32) -> Result<&'static Thread, i32> {
 /// The minor version number is freely choosable, it is printed in the GDB server’s log file but it is not evaluated.
 #[no_mangle]
 pub extern "C" fn RTOS_GetVersion() -> c_uint {
+    /* As we are currently supporting API V1.1, we must return 101 */
     101
 }
 

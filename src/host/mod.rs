@@ -1,5 +1,5 @@
 //! A simple interface to the J-Link GDB Server
-//! 
+//!
 //! This module provides the following:
 //! * Memory allocator that's based on the GDB Server's API
 //! * Wrapper functions of the GDB Server's API
@@ -21,12 +21,10 @@ use ext_log::Level;
 
 /// Initializes the GDB Server API, enabling the allocator, logger and API wrapper functions.
 pub fn init(p_api: *const GdbApi, log_level: Level) -> Result<(), ()> {
-
     // Initialize the allocator and API wrapper.
     api::init(p_api)?;
 
-
-    // Once the API is initialized, we can initialize the logger.
+    // Once the API is initialized (an memory allocation is enabled), we can initialize the logger.
     match log::init_with_level(log_level) {
         Err(_) => return Err(()),
         _ => (),

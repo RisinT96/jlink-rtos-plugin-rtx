@@ -1,16 +1,247 @@
-//! Bindings auto generated from SEGGER RTOS Plug-in SDK.
-#![allow(non_upper_case_globals)]
-#![allow(non_camel_case_types)]
-#![allow(non_snake_case)]
-#![allow(unused)]
-include!(concat!(env!("OUT_DIR"), "/jlink_bindings.rs"));
-
-pub use JLINK_CORE_CORTEX_M0 as CORTEX_M0;
-pub use JLINK_CORE_CORTEX_M1 as CORTEX_M1;
-pub use JLINK_CORE_CORTEX_M3 as CORTEX_M3;
-pub use JLINK_CORE_CORTEX_M4 as CORTEX_M4;
+//! Bindings auto generated from SEGGER RTOS Plug-in S
 
 use num_derive::FromPrimitive;
+
+pub const CORE_NONE: u32 = 0;
+pub const CORE_ANY: u32 = 4294967295;
+pub const CORE_CORTEX_M1: u32 = 16777471;
+pub const CORE_COLDFIRE: u32 = 50331647;
+pub const CORE_CORTEX_M3: u32 = 50331903;
+pub const CORE_CORTEX_M3_R1P0: u32 = 50331664;
+pub const CORE_CORTEX_M3_R1P1: u32 = 50331665;
+pub const CORE_CORTEX_M3_R2P0: u32 = 50331680;
+pub const CORE_SIM: u32 = 83886079;
+pub const CORE_XSCALE: u32 = 100663295;
+pub const CORE_CORTEX_M0: u32 = 100663551;
+pub const CORE_CORTEX_M_V8BASEL: u32 = 100729087;
+pub const CORE_ARM7: u32 = 134217727;
+pub const CORE_ARM7TDMI: u32 = 117440767;
+pub const CORE_ARM7TDMI_R3: u32 = 117440575;
+pub const CORE_ARM7TDMI_R4: u32 = 117440591;
+pub const CORE_ARM7TDMI_S: u32 = 117441023;
+pub const CORE_ARM7TDMI_S_R3: u32 = 117440831;
+pub const CORE_ARM7TDMI_S_R4: u32 = 117440847;
+pub const CORE_CORTEX_A8: u32 = 134217983;
+pub const CORE_CORTEX_A7: u32 = 134742271;
+pub const CORE_CORTEX_A9: u32 = 134807807;
+pub const CORE_CORTEX_A12: u32 = 134873343;
+pub const CORE_CORTEX_A15: u32 = 134938879;
+pub const CORE_CORTEX_A17: u32 = 135004415;
+pub const CORE_ARM9: u32 = 167772159;
+pub const CORE_ARM9TDMI_S: u32 = 150995455;
+pub const CORE_ARM920T: u32 = 153092351;
+pub const CORE_ARM922T: u32 = 153223423;
+pub const CORE_ARM926EJ_S: u32 = 153485823;
+pub const CORE_ARM946E_S: u32 = 155582975;
+pub const CORE_ARM966E_S: u32 = 157680127;
+pub const CORE_ARM968E_S: u32 = 157811199;
+pub const CORE_ARM11: u32 = 201326591;
+pub const CORE_ARM1136: u32 = 188153855;
+pub const CORE_ARM1136J: u32 = 188089087;
+pub const CORE_ARM1136J_S: u32 = 188089343;
+pub const CORE_ARM1136JF: u32 = 188090111;
+pub const CORE_ARM1136JF_S: u32 = 188090367;
+pub const CORE_ARM1156: u32 = 190251007;
+pub const CORE_ARM1176: u32 = 192348159;
+pub const CORE_ARM1176J: u32 = 192283391;
+pub const CORE_ARM1176J_S: u32 = 192283647;
+pub const CORE_ARM1176JF: u32 = 192284415;
+pub const CORE_ARM1176JF_S: u32 = 192284671;
+pub const CORE_CORTEX_R4: u32 = 201326847;
+pub const CORE_CORTEX_R5: u32 = 201392383;
+pub const CORE_RX: u32 = 234881023;
+pub const CORE_RX610: u32 = 218169343;
+pub const CORE_RX62N: u32 = 218234879;
+pub const CORE_RX62T: u32 = 218300415;
+pub const CORE_RX63N: u32 = 218365951;
+pub const CORE_RX630: u32 = 218431487;
+pub const CORE_RX63T: u32 = 218497023;
+pub const CORE_RX621: u32 = 218562559;
+pub const CORE_RX62G: u32 = 218628095;
+pub const CORE_RX631: u32 = 218693631;
+pub const CORE_RX65N: u32 = 218759167;
+pub const CORE_RX210: u32 = 219217919;
+pub const CORE_RX21A: u32 = 219283455;
+pub const CORE_RX220: u32 = 219348991;
+pub const CORE_RX230: u32 = 219414527;
+pub const CORE_RX231: u32 = 219480063;
+pub const CORE_RX23T: u32 = 219545599;
+pub const CORE_RX24T: u32 = 219611135;
+pub const CORE_RX111: u32 = 220266495;
+pub const CORE_RX110: u32 = 220332031;
+pub const CORE_RX113: u32 = 220397567;
+pub const CORE_RX130: u32 = 220463103;
+pub const CORE_RX64M: u32 = 221315071;
+pub const CORE_RX71M: u32 = 221380607;
+pub const CORE_CORTEX_M4: u32 = 234881279;
+pub const CORE_CORTEX_M7: u32 = 234946815;
+pub const CORE_CORTEX_M_V8MAINL: u32 = 235012351;
+pub const CORE_CORTEX_A5: u32 = 251658495;
+pub const CORE_POWER_PC: u32 = 285212671;
+pub const CORE_POWER_PC_N1: u32 = 285147391;
+pub const CORE_POWER_PC_N2: u32 = 285147647;
+pub const CORE_MIPS: u32 = 301989887;
+pub const CORE_MIPS_M4K: u32 = 285278207;
+pub const CORE_MIPS_MICROAPTIV: u32 = 285343743;
+pub const CORE_EFM8_UNSPEC: u32 = 318767103;
+pub const CORE_CIP51: u32 = 302055423;
+
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_R0:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 0;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_R1:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 1;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_R2:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 2;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_R3:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 3;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_R4:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 4;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_R5:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 5;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_R6:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 6;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_R7:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 7;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_R8:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 8;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_R9:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 9;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_R10:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 10;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_R11:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 11;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_R12:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 12;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_SP:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 13;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_LR:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 14;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_PC:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 15;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_XPSR:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 16;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_MSP:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 17;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_PSP:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 18;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_PRIMASK:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 19;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_BASEPRI:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 20;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_FAULTMASK:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 21;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_CONTROL:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 22;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_FPSCR:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 23;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S0:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 24;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S1:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 25;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S2:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 26;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S3:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 27;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S4:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 28;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S5:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 29;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S6:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 30;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S7:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 31;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S8:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 32;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S9:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 33;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S10:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 34;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S11:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 35;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S12:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 36;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S13:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 37;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S14:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 38;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S15:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 39;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S16:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 40;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S17:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 41;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S18:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 42;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S19:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 43;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S20:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 44;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S21:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 45;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S22:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 46;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S23:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 47;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S24:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 48;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S25:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 49;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S26:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 50;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S27:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 51;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S28:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 52;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S29:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 53;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S30:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 54;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_S31:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 55;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_D0:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 56;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_D1:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 57;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_D2:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 58;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_D3:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 59;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_D4:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 60;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_D5:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 61;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_D6:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 62;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_D7:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 63;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_D8:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 64;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_D9:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 65;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_D10:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 66;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_D11:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 67;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_D12:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 68;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_D13:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 69;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_D14:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 70;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_D15:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 71;
+pub const RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_NUMREGS:
+    RTOS_PLUGIN_CPU_REGS_CORTEX_M = 72;
+
+pub type RTOS_PLUGIN_CPU_REGS_CORTEX_M = u32;
+
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RTOS_SYMBOLS {
+    pub name: *const ::std::os::raw::c_char,
+    pub optional: ::std::os::raw::c_int,
+    pub address: ::std::os::raw::c_uint,
+}
 
 #[derive(FromPrimitive)]
 pub enum RegName {
@@ -86,4 +317,84 @@ pub enum RegName {
     D13 = RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_D13 as isize,
     D14 = RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_D14 as isize,
     D15 = RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_D15 as isize,
+}
+
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GDB_API {
+    pub pfFree: ::std::option::Option<unsafe extern "C" fn(p: *mut ::std::os::raw::c_void)>,
+    pub pfAlloc: ::std::option::Option<
+        unsafe extern "C" fn(Size: ::std::os::raw::c_uint) -> *mut ::std::os::raw::c_void,
+    >,
+    pub pfRealloc: ::std::option::Option<
+        unsafe extern "C" fn(
+            p: *mut ::std::os::raw::c_void,
+            Size: ::std::os::raw::c_uint,
+        ) -> *mut ::std::os::raw::c_void,
+    >,
+    pub pfLogOutf:
+        ::std::option::Option<unsafe extern "C" fn(sFormat: *const ::std::os::raw::c_char, ...)>,
+    pub pfDebugOutf:
+        ::std::option::Option<unsafe extern "C" fn(sFormat: *const ::std::os::raw::c_char, ...)>,
+    pub pfWarnOutf:
+        ::std::option::Option<unsafe extern "C" fn(sFormat: *const ::std::os::raw::c_char, ...)>,
+    pub pfErrorOutf:
+        ::std::option::Option<unsafe extern "C" fn(sFormat: *const ::std::os::raw::c_char, ...)>,
+    pub pfReadMem: ::std::option::Option<
+        unsafe extern "C" fn(
+            Addr: ::std::os::raw::c_uint,
+            pData: *mut ::std::os::raw::c_char,
+            NumBytes: ::std::os::raw::c_uint,
+        ) -> ::std::os::raw::c_int,
+    >,
+    pub pfReadU8: ::std::option::Option<
+        unsafe extern "C" fn(
+            Addr: ::std::os::raw::c_uint,
+            pData: *mut ::std::os::raw::c_uchar,
+        ) -> ::std::os::raw::c_char,
+    >,
+    pub pfReadU16: ::std::option::Option<
+        unsafe extern "C" fn(
+            Addr: ::std::os::raw::c_uint,
+            pData: *mut ::std::os::raw::c_ushort,
+        ) -> ::std::os::raw::c_char,
+    >,
+    pub pfReadU32: ::std::option::Option<
+        unsafe extern "C" fn(
+            Addr: ::std::os::raw::c_uint,
+            pData: *mut ::std::os::raw::c_uint,
+        ) -> ::std::os::raw::c_char,
+    >,
+    pub pfWriteMem: ::std::option::Option<
+        unsafe extern "C" fn(
+            Addr: ::std::os::raw::c_uint,
+            pData: *const ::std::os::raw::c_char,
+            NumBytes: ::std::os::raw::c_uint,
+        ) -> ::std::os::raw::c_int,
+    >,
+    pub pfWriteU8: ::std::option::Option<
+        unsafe extern "C" fn(Addr: ::std::os::raw::c_uint, Data: ::std::os::raw::c_uchar),
+    >,
+    pub pfWriteU16: ::std::option::Option<
+        unsafe extern "C" fn(Addr: ::std::os::raw::c_uint, Data: ::std::os::raw::c_ushort),
+    >,
+    pub pfWriteU32: ::std::option::Option<
+        unsafe extern "C" fn(Addr: ::std::os::raw::c_uint, Data: ::std::os::raw::c_uint),
+    >,
+    pub pfLoad16TE: ::std::option::Option<
+        unsafe extern "C" fn(p: *const ::std::os::raw::c_uchar) -> ::std::os::raw::c_uint,
+    >,
+    pub pfLoad24TE: ::std::option::Option<
+        unsafe extern "C" fn(p: *const ::std::os::raw::c_uchar) -> ::std::os::raw::c_uint,
+    >,
+    pub pfLoad32TE: ::std::option::Option<
+        unsafe extern "C" fn(p: *const ::std::os::raw::c_uchar) -> ::std::os::raw::c_uint,
+    >,
+    pub pfReadReg: ::std::option::Option<
+        unsafe extern "C" fn(RegIndex: ::std::os::raw::c_uint) -> ::std::os::raw::c_uint,
+    >,
+    pub pfWriteReg: ::std::option::Option<
+        unsafe extern "C" fn(RegIndex: ::std::os::raw::c_uint, Value: ::std::os::raw::c_uint),
+    >,
+    pub Dummy: *mut ::std::os::raw::c_void,
 }
