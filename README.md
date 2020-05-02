@@ -1,1 +1,1 @@
-# J-Link GDB Server RTOS Plug-In - RTX [![Rust: Build](https://github.com/RisinT96/jlink-rtos-plugin-rtx/workflows/Rust/badge.svg)][![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+# J-Link GDB Server RTOS Plug-In - RTX [![Rust: Build](https://github.com/RisinT96/jlink-rtos-plugin-rtx/workflows/Rust/badge.svg)](https://github.com/RisinT96/jlink-rtos-plugin-rtx/actions?query=workflow%3ARust)[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
