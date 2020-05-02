@@ -10,6 +10,11 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: i686-pc-windows-msvc
+          override: true
       - uses: actions-rs/cargo@v1
         with:
           command: build
@@ -17,7 +22,8 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           path: target/i686-pc-windows-msvc/release/*.dll
-          name: win-32
+          name: win32
+
   build-linux-32:
     runs-on: ubuntu-latest
     steps:
@@ -30,7 +36,8 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           path: target/i686-unknown-linux-gnu/release/*.so
-          name: linux-32
+          name: linux32
+
   build-linux-64:
     runs-on: ubuntu-latest
     steps:
@@ -43,15 +50,24 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           path: target/x86_64-unknown-linux-gnu/release/*.so
-          name: linux-64
+          name: linux
+
   release:
     needs: [build-win-32, build-linux-32, build-linux-64]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v2
         with:
-            path: artifacts/
+          path: artifacts/
+      - run: zip -r release.zip artifacts/
       - uses: softprops/action-gh-release@v1
         with:
-          files: artifacts/*
-
+          files: release.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: geekyeggo/delete-artifact@v1
+        with:
+          name: |
+            win32
+            linux32
+            linux
