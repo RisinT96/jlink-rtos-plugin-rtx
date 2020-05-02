@@ -52,20 +52,3 @@ pub fn init_with_level(level: Level) -> Result<(), SetLoggerError> {
 
     Ok(())
 }
-
-/// Initializes the global logger with a GdbLogger instance with
-/// `max_log_level` set to `LogLevel::Trace`.
-///
-/// ### Usage
-/// ```
-/// mod host;
-///
-/// fn main() {
-///     host::log::init().unwrap();
-///
-///     info!("This is an example message.");
-/// }
-/// ```
-pub fn init() -> Result<(), SetLoggerError> {
-    init_with_level(Level::Trace)
-}

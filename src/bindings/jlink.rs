@@ -7,56 +7,56 @@ use num_derive::FromPrimitive;
 
 #[derive(FromPrimitive)]
 pub enum Core {
-    NONE = 0x00000000,
-    ANY = 0xFFFFFFFF,
-    CORTEX_M1 = 0x010000FF,
-    COLDFIRE = 0x02FFFFFF,
-    CORTEX_M3 = 0x030000FF,
-    CORTEX_M3_R1P0 = 0x03000010,
-    CORTEX_M3_R1P1 = 0x03000011,
-    CORTEX_M3_R2P0 = 0x03000020,
+    None = 0x00000000,
+    Any = 0xFFFFFFFF,
+    CortexM1 = 0x010000FF,
+    Coldfire = 0x02FFFFFF,
+    CortexM3 = 0x030000FF,
+    CortexM3r1p0 = 0x03000010,
+    CortexM3r1p1 = 0x03000011,
+    CortexM3r2p0 = 0x03000020,
     SIM = 0x04FFFFFF,
     XSCALE = 0x05FFFFFF,
-    CORTEX_M0 = 0x060000FF,
-    CORTEX_M_V8BASEL = 0x060100FF,
+    CortexM0 = 0x060000FF,
+    CortexMv8BASEL = 0x060100FF,
     ARM7 = 0x07FFFFFF,
     ARM7TDMI = 0x070000FF,
-    ARM7TDMI_R3 = 0x0700003F,
-    ARM7TDMI_R4 = 0x0700004F,
-    ARM7TDMI_S = 0x070001FF,
-    ARM7TDMI_S_R3 = 0x0700013F,
-    ARM7TDMI_S_R4 = 0x0700014F,
-    CORTEX_A8 = 0x080000FF,
-    CORTEX_A7 = 0x080800FF, // Same family as Cortex-A9. Only low-level differences
-    CORTEX_A9 = 0x080900FF, // Cortex-A9. Cortex-A8 compatible only small differences for future multi-core debugging support.
-    CORTEX_A12 = 0x080A00FF, // Same family as Cortex-A9. Only low-level differences
-    CORTEX_A15 = 0x080B00FF, // Same family as Cortex-A9. Only low-level differences
-    CORTEX_A17 = 0x080C00FF, // Same family as Cortex-A9. Only low-level differences
+    ARM7TDMIr3 = 0x0700003F,
+    ARM7TDMIr4 = 0x0700004F,
+    ARM7TDMIs = 0x070001FF,
+    ARM7TDMIsr3 = 0x0700013F,
+    ARM7TDMIsr4 = 0x0700014F,
+    CortexA8 = 0x080000FF,
+    CortexA7 = 0x080800FF, // Same family as Cortex-A9. Only low-level differences
+    CortexA9 = 0x080900FF, // Cortex-A9. Cortex-A8 compatible only small differences for future multi-core debugging support.
+    CortexA12 = 0x080A00FF, // Same family as Cortex-A9. Only low-level differences
+    CortesA15 = 0x080B00FF, // Same family as Cortex-A9. Only low-level differences
+    CortexA17 = 0x080C00FF, // Same family as Cortex-A9. Only low-level differences
     ARM9 = 0x09FFFFFF,
-    ARM9TDMI_S = 0x090001FF,
+    ARM9TDMIs = 0x090001FF,
     ARM920T = 0x092000FF,
     ARM922T = 0x092200FF,
-    ARM926EJ_S = 0x092601FF,
-    ARM946E_S = 0x094601FF,
-    ARM966E_S = 0x096601FF,
-    ARM968E_S = 0x096801FF,
+    ARM926EJs = 0x092601FF,
+    ARM946Es = 0x094601FF,
+    ARM966Es = 0x096601FF,
+    ARM968Es = 0x096801FF,
     ARM11 = 0x0BFFFFFF,
     ARM1136 = 0x0B36FFFF,
     ARM1136J = 0x0B3602FF,
-    ARM1136J_S = 0x0B3603FF,
+    ARM1136Js = 0x0B3603FF,
     ARM1136JF = 0x0B3606FF,
-    ARM1136JF_S = 0x0B3607FF,
+    ARM1136JFs = 0x0B3607FF,
     ARM1156 = 0x0B56FFFF,
     ARM1176 = 0x0B76FFFF,
     ARM1176J = 0x0B7602FF,
-    ARM1176J_S = 0x0B7603FF,
+    ARM1176Js = 0x0B7603FF,
     ARM1176JF = 0x0B7606FF,
-    ARM1176JF_S = 0x0B7607FF,
-    CORTEX_R4 = 0x0C0000FF, // Device family: 0x0D => Cortex-R, sub-family 0x00: Cortex-R4
-    CORTEX_R5 = 0x0C0100FF, // Device family: 0x0D => Cortex-R, sub-family 0x01: Cortex-R5
-    RX = 0x0DFFFFFF,        // Device family: 0x0D, sub family not specified, revision not specified
-    RX610 = 0x0D00FFFF,     // Device family: 0x0D, sub family 0x00, revision not specified
-    RX62N = 0x0D01FFFF,     // Device family: 0x0D, sub family 0x01, revision not specified
+    ARM1176JFs = 0x0B7607FF,
+    CortexR4 = 0x0C0000FF, // Device family: 0x0D => Cortex-R, sub-family 0x00: Cortex-R4
+    CortexR5 = 0x0C0100FF, // Device family: 0x0D => Cortex-R, sub-family 0x01: Cortex-R5
+    RX = 0x0DFFFFFF,       // Device family: 0x0D, sub family not specified, revision not specified
+    RX610 = 0x0D00FFFF,    // Device family: 0x0D, sub family 0x00, revision not specified
+    RX62N = 0x0D01FFFF,    // Device family: 0x0D, sub family 0x01, revision not specified
     RX62T = 0x0D02FFFF,
     RX63N = 0x0D03FFFF,
     RX630 = 0x0D04FFFF,
@@ -78,18 +78,18 @@ pub enum Core {
     RX130 = 0x0D23FFFF,
     RX64M = 0x0D30FFFF,
     RX71M = 0x0D31FFFF,
-    CORTEX_M4 = 0x0E0000FF,
-    CORTEX_M7 = 0x0E0100FF, // Device family: 0x0E (M4), sub family: 0x01
-    CORTEX_M_V8MAINL = 0x0E0200FF,
-    CORTEX_A5 = 0x0F0000FF,
-    POWER_PC = 0x10FFFFFF,
-    POWER_PC_N1 = 0x10FF00FF,     // Core with Nexus-1  support
-    POWER_PC_N2 = 0x10FF01FF,     // Core with Nexus-2+ support
-    MIPS = 0x11FFFFFF,            // Dev family: MIPS, sub family not specified
-    MIPS_M4K = 0x1100FFFF,        // Dev family: MIPS, sub family: 0x00 (M4K core)
-    MIPS_MICROAPTIV = 0x1101FFFF, // Dev family: MIPS, sub family: 0x01 (microAptiv core)
-    EFM8_UNSPEC = 0x12FFFFFF, // Dev family: SiLabs EFM8, sub family 0xFF (exact core not specified)
-    CIP51 = 0x1200FFFF,       // Dev family: SiLabs EFM8, sub family 0x00 (CIP51 core)
+    CortexM4 = 0x0E0000FF,
+    CortexM7 = 0x0E0100FF, // Device family: 0x0E (M4), sub family: 0x01
+    CortexMv8mainl = 0x0E0200FF,
+    CortexA5 = 0x0F0000FF,
+    PowerPc = 0x10FFFFFF,
+    PowerPcN1 = 0x10FF00FF,      // Core with Nexus-1  support
+    PowerPcN2 = 0x10FF01FF,      // Core with Nexus-2+ support
+    MIPS = 0x11FFFFFF,           // Dev family: MIPS, sub family not specified
+    MIPSm4k = 0x1100FFFF,        // Dev family: MIPS, sub family: 0x00 (M4K core)
+    MIPSmicroAptiv = 0x1101FFFF, // Dev family: MIPS, sub family: 0x01 (microAptiv core)
+    EFM8unspec = 0x12FFFFFF, // Dev family: SiLabs EFM8, sub family 0xFF (exact core not specified)
+    CIP51 = 0x1200FFFF,      // Dev family: SiLabs EFM8, sub family 0x00 (CIP51 core)
 }
 
 #[repr(C)]
