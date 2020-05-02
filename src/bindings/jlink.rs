@@ -1,4 +1,16 @@
-//! Bindings auto generated from SEGGER RTOS Plug-in S
+//! Bindings auto generated from SEGGER RTOS Plug-in SDK V1.10
+
+/*
+ * The plug-in client API definitions (the `RTOS_*` functions) and the
+ * GDB Server API definitions are compatible with the SEGGER GDBServer
+ * RTOS Plug-in SDK API definitions.
+ *
+ * All IP rights, title and interest in the GDBServer RTOS Plug-in SDK
+ * are and shall at all times remain with SEGGER.
+ *
+ * Copyright (c) 2004-2020 SEGGER Microcontroller GmbH & Co. KG
+ * Internet: www.segger.com        Support:  support@segger.com
+ */
 
 use std::option::Option;
 use std::os::raw::{c_char, c_int, c_uchar, c_uint, c_ushort, c_void};
