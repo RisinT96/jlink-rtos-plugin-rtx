@@ -124,6 +124,11 @@ pub extern "C" fn RTOS_Init(p_api: *const api::GdbApi, core: c_uint) -> c_int {
     // Now the underlying systems should be initialized, we can begin work.
     info!("Initializing RTX Plugin. core: {}", core);
 
+    let core: jlink::Core = match FromPrimitive::from_u32(core) {
+        Some(val) => val,
+        _ => return 0,
+    };
+
     if let Err(_) = device::core::init(core) {
         return 0;
     }

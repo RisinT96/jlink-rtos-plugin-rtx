@@ -138,12 +138,15 @@ unsafe fn core_set(core: Core) {
 /* ------------------------------------- Public Functions ----------------------------------------------------------- */
 
 /// Initialize the core submodule.
-pub fn init(core: u32) -> Result<(), i32> {
+pub fn init(core: jlink::Core) -> Result<(), i32> {
     match core {
-        jlink::CORE_CORTEX_M0 => info!("Core: Cortex-M0"),
-        jlink::CORE_CORTEX_M1 => info!("Core: Cortex-M1"),
-        jlink::CORE_CORTEX_M3 => info!("Core: Cortex-M3"),
-        jlink::CORE_CORTEX_M4 => info!("Core: Cortex-M4"),
+        jlink::Core::CORTEX_M0 => info!("Core: Cortex-M0"),
+        jlink::Core::CORTEX_M1 => info!("Core: Cortex-M1"),
+        jlink::Core::CORTEX_M3
+        | jlink::Core::CORTEX_M3_R1P0
+        | jlink::Core::CORTEX_M3_R1P1
+        | jlink::Core::CORTEX_M3_R2P0 => info!("Core: Cortex-M3"),
+        jlink::Core::CORTEX_M4 => info!("Core: Cortex-M4"),
         _ => return Err(api::GDB_ERR),
     };
 
@@ -188,9 +191,14 @@ pub fn get_halt_reason() -> Result<u32, i32> {
 /* ------------------------------------- Private Functions ---------------------------------------------------------- */
 
 /// Find out whether the core has an FPU or not.
-fn find_fpu(core: u32) -> Result<bool, i32> {
+fn find_fpu(core: jlink::Core) -> Result<bool, i32> {
     match core {
-        jlink::CORE_CORTEX_M0 | jlink::CORE_CORTEX_M1 | jlink::CORE_CORTEX_M3 => return Ok(false),
+        jlink::Core::CORTEX_M0
+        | jlink::Core::CORTEX_M1
+        | jlink::Core::CORTEX_M3
+        | jlink::Core::CORTEX_M3_R1P0
+        | jlink::Core::CORTEX_M3_R1P1
+        | jlink::Core::CORTEX_M3_R2P0 => return Ok(false),
 
         _ => (),
     };
