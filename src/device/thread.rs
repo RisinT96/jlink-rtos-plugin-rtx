@@ -177,12 +177,12 @@ impl Thread {
             while others from the stack */
 
             // Assume PSP is still valid
-            let sp = api::read_reg(jlink::RegName::PSP as u32)?;
+            let sp = api::read_reg(jlink::Registers::PSP as u32)?;
 
             let lr;
             if (core::HaltReason::VCatch as u32 & core::get_halt_reason()?) != 0 {
                 // Vector catch just occured, take live LR.
-                lr = api::read_reg(jlink::RegName::LR as u32)? as u8;
+                lr = api::read_reg(jlink::Registers::LR as u32)? as u8;
             } else {
                 // Otherwise take LR from previous context switch and hope it's up to date.
                 lr = thread_info.stack_frame;
@@ -309,12 +309,12 @@ fn load_thread_registers_all(sp: u32) -> Result<ThreadRegs, i32> {
         lr: api::convert_u32(regs.hw_stacked.lr)?,
         pc: api::convert_u32(regs.hw_stacked.pc)?,
         xpsr: api::convert_u32(regs.hw_stacked.xpsr)?,
-        msp: api::read_reg(jlink::RegName::MSP as u32)?,
-        psp: api::read_reg(jlink::RegName::PSP as u32)?,
-        primask: api::read_reg(jlink::RegName::PRIMASK as u32)?,
-        basepri: api::read_reg(jlink::RegName::BASEPRI as u32)?,
-        faultmask: api::read_reg(jlink::RegName::FAULTMASK as u32)?,
-        control: api::read_reg(jlink::RegName::CONTROL as u32)?,
+        msp: api::read_reg(jlink::Registers::MSP as u32)?,
+        psp: api::read_reg(jlink::Registers::PSP as u32)?,
+        primask: api::read_reg(jlink::Registers::PRIMASK as u32)?,
+        basepri: api::read_reg(jlink::Registers::BASEPRI as u32)?,
+        faultmask: api::read_reg(jlink::Registers::FAULTMASK as u32)?,
+        control: api::read_reg(jlink::Registers::CONTROL as u32)?,
     }))
 }
 
@@ -326,25 +326,25 @@ fn load_thread_registers_hw(sp: u32) -> Result<ThreadRegs, i32> {
         r1: api::convert_u32(regs.r1)?,
         r2: api::convert_u32(regs.r2)?,
         r3: api::convert_u32(regs.r3)?,
-        r4: api::read_reg(jlink::RegName::R4 as u32)?,
-        r5: api::read_reg(jlink::RegName::R5 as u32)?,
-        r6: api::read_reg(jlink::RegName::R6 as u32)?,
-        r7: api::read_reg(jlink::RegName::R7 as u32)?,
-        r8: api::read_reg(jlink::RegName::R8 as u32)?,
-        r9: api::read_reg(jlink::RegName::R9 as u32)?,
-        r10: api::read_reg(jlink::RegName::R10 as u32)?,
-        r11: api::read_reg(jlink::RegName::R11 as u32)?,
+        r4: api::read_reg(jlink::Registers::R4 as u32)?,
+        r5: api::read_reg(jlink::Registers::R5 as u32)?,
+        r6: api::read_reg(jlink::Registers::R6 as u32)?,
+        r7: api::read_reg(jlink::Registers::R7 as u32)?,
+        r8: api::read_reg(jlink::Registers::R8 as u32)?,
+        r9: api::read_reg(jlink::Registers::R9 as u32)?,
+        r10: api::read_reg(jlink::Registers::R10 as u32)?,
+        r11: api::read_reg(jlink::Registers::R11 as u32)?,
         r12: api::convert_u32(regs.r12)?,
         sp: sp + std::mem::size_of::<GeneralRegsStackedHw>() as u32,
         lr: api::convert_u32(regs.lr)?,
         pc: api::convert_u32(regs.pc)?,
         xpsr: api::convert_u32(regs.xpsr)?,
-        msp: api::read_reg(jlink::RegName::MSP as u32)?,
-        psp: api::read_reg(jlink::RegName::PSP as u32)?,
-        primask: api::read_reg(jlink::RegName::PRIMASK as u32)?,
-        basepri: api::read_reg(jlink::RegName::BASEPRI as u32)?,
-        faultmask: api::read_reg(jlink::RegName::FAULTMASK as u32)?,
-        control: api::read_reg(jlink::RegName::CONTROL as u32)?,
+        msp: api::read_reg(jlink::Registers::MSP as u32)?,
+        psp: api::read_reg(jlink::Registers::PSP as u32)?,
+        primask: api::read_reg(jlink::Registers::PRIMASK as u32)?,
+        basepri: api::read_reg(jlink::Registers::BASEPRI as u32)?,
+        faultmask: api::read_reg(jlink::Registers::FAULTMASK as u32)?,
+        control: api::read_reg(jlink::Registers::CONTROL as u32)?,
     }))
 }
 
@@ -369,12 +369,12 @@ fn load_thread_registers_fpu_all(sp: u32) -> Result<ThreadRegs, i32> {
         lr: api::convert_u32(regs.hw_stacked.lr)?,
         pc: api::convert_u32(regs.hw_stacked.pc)?,
         xpsr: api::convert_u32(regs.hw_stacked.xpsr)?,
-        msp: api::read_reg(jlink::RegName::MSP as u32)?,
-        psp: api::read_reg(jlink::RegName::PSP as u32)?,
-        primask: api::read_reg(jlink::RegName::PRIMASK as u32)?,
-        basepri: api::read_reg(jlink::RegName::BASEPRI as u32)?,
-        faultmask: api::read_reg(jlink::RegName::FAULTMASK as u32)?,
-        control: api::read_reg(jlink::RegName::CONTROL as u32)?,
+        msp: api::read_reg(jlink::Registers::MSP as u32)?,
+        psp: api::read_reg(jlink::Registers::PSP as u32)?,
+        primask: api::read_reg(jlink::Registers::PRIMASK as u32)?,
+        basepri: api::read_reg(jlink::Registers::BASEPRI as u32)?,
+        faultmask: api::read_reg(jlink::Registers::FAULTMASK as u32)?,
+        control: api::read_reg(jlink::Registers::CONTROL as u32)?,
     };
 
     Ok(ThreadRegs::SomeFpu(GeneralRegsFpu {
@@ -423,25 +423,25 @@ fn load_thread_registers_fpu_hw(sp: u32) -> Result<ThreadRegs, i32> {
         r1: api::convert_u32(regs.r1)?,
         r2: api::convert_u32(regs.r2)?,
         r3: api::convert_u32(regs.r3)?,
-        r4: api::read_reg(jlink::RegName::R4 as u32)?,
-        r5: api::read_reg(jlink::RegName::R5 as u32)?,
-        r6: api::read_reg(jlink::RegName::R6 as u32)?,
-        r7: api::read_reg(jlink::RegName::R7 as u32)?,
-        r8: api::read_reg(jlink::RegName::R8 as u32)?,
-        r9: api::read_reg(jlink::RegName::R9 as u32)?,
-        r10: api::read_reg(jlink::RegName::R10 as u32)?,
-        r11: api::read_reg(jlink::RegName::R11 as u32)?,
+        r4: api::read_reg(jlink::Registers::R4 as u32)?,
+        r5: api::read_reg(jlink::Registers::R5 as u32)?,
+        r6: api::read_reg(jlink::Registers::R6 as u32)?,
+        r7: api::read_reg(jlink::Registers::R7 as u32)?,
+        r8: api::read_reg(jlink::Registers::R8 as u32)?,
+        r9: api::read_reg(jlink::Registers::R9 as u32)?,
+        r10: api::read_reg(jlink::Registers::R10 as u32)?,
+        r11: api::read_reg(jlink::Registers::R11 as u32)?,
         r12: api::convert_u32(regs.r12)?,
         sp: sp + std::mem::size_of::<GeneralRegsFpuStackedHw>() as u32,
         lr: api::convert_u32(regs.lr)?,
         pc: api::convert_u32(regs.pc)?,
         xpsr: api::convert_u32(regs.xpsr)?,
-        msp: api::read_reg(jlink::RegName::MSP as u32)?,
-        psp: api::read_reg(jlink::RegName::PSP as u32)?,
-        primask: api::read_reg(jlink::RegName::PRIMASK as u32)?,
-        basepri: api::read_reg(jlink::RegName::BASEPRI as u32)?,
-        faultmask: api::read_reg(jlink::RegName::FAULTMASK as u32)?,
-        control: api::read_reg(jlink::RegName::CONTROL as u32)?,
+        msp: api::read_reg(jlink::Registers::MSP as u32)?,
+        psp: api::read_reg(jlink::Registers::PSP as u32)?,
+        primask: api::read_reg(jlink::Registers::PRIMASK as u32)?,
+        basepri: api::read_reg(jlink::Registers::BASEPRI as u32)?,
+        faultmask: api::read_reg(jlink::Registers::FAULTMASK as u32)?,
+        control: api::read_reg(jlink::Registers::CONTROL as u32)?,
     };
 
     Ok(ThreadRegs::SomeFpu(GeneralRegsFpu {
@@ -463,21 +463,21 @@ fn load_thread_registers_fpu_hw(sp: u32) -> Result<ThreadRegs, i32> {
         s13: api::convert_u32(regs.s13)?,
         s14: api::convert_u32(regs.s14)?,
         s15: api::convert_u32(regs.s15)?,
-        s16: api::read_reg(jlink::RegName::S16 as u32)?,
-        s17: api::read_reg(jlink::RegName::S17 as u32)?,
-        s18: api::read_reg(jlink::RegName::S18 as u32)?,
-        s19: api::read_reg(jlink::RegName::S19 as u32)?,
-        s20: api::read_reg(jlink::RegName::S20 as u32)?,
-        s21: api::read_reg(jlink::RegName::S21 as u32)?,
-        s22: api::read_reg(jlink::RegName::S22 as u32)?,
-        s23: api::read_reg(jlink::RegName::S23 as u32)?,
-        s24: api::read_reg(jlink::RegName::S24 as u32)?,
-        s25: api::read_reg(jlink::RegName::S25 as u32)?,
-        s26: api::read_reg(jlink::RegName::S26 as u32)?,
-        s27: api::read_reg(jlink::RegName::S27 as u32)?,
-        s28: api::read_reg(jlink::RegName::S28 as u32)?,
-        s29: api::read_reg(jlink::RegName::S29 as u32)?,
-        s30: api::read_reg(jlink::RegName::S30 as u32)?,
-        s31: api::read_reg(jlink::RegName::S31 as u32)?,
+        s16: api::read_reg(jlink::Registers::S16 as u32)?,
+        s17: api::read_reg(jlink::Registers::S17 as u32)?,
+        s18: api::read_reg(jlink::Registers::S18 as u32)?,
+        s19: api::read_reg(jlink::Registers::S19 as u32)?,
+        s20: api::read_reg(jlink::Registers::S20 as u32)?,
+        s21: api::read_reg(jlink::Registers::S21 as u32)?,
+        s22: api::read_reg(jlink::Registers::S22 as u32)?,
+        s23: api::read_reg(jlink::Registers::S23 as u32)?,
+        s24: api::read_reg(jlink::Registers::S24 as u32)?,
+        s25: api::read_reg(jlink::Registers::S25 as u32)?,
+        s26: api::read_reg(jlink::Registers::S26 as u32)?,
+        s27: api::read_reg(jlink::Registers::S27 as u32)?,
+        s28: api::read_reg(jlink::Registers::S28 as u32)?,
+        s29: api::read_reg(jlink::Registers::S29 as u32)?,
+        s30: api::read_reg(jlink::Registers::S30 as u32)?,
+        s31: api::read_reg(jlink::Registers::S31 as u32)?,
     }))
 }

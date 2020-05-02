@@ -12,7 +12,7 @@ extern crate memchr;
 
 use byteorder::{ByteOrder, NativeEndian};
 
-pub use crate::bindings::jlink::GDB_API as GdbApi;
+pub use crate::bindings::jlink::GdbApi;
 
 pub const GDB_OK: i32 = 0;
 pub const GDB_ERR: i32 = -1;
@@ -57,7 +57,7 @@ pub fn init(p_api: *const GdbApi) -> Result<(), ()> {
 
 pub unsafe fn free(ptr: *mut u8) {
     if let Some(gdb_api) = gdb_api_get() {
-        if let Some(f) = gdb_api.pfFree {
+        if let Some(f) = gdb_api.free {
             f(ptr as *mut c_void);
         }
     }
@@ -65,7 +65,7 @@ pub unsafe fn free(ptr: *mut u8) {
 
 pub unsafe fn alloc(size: usize) -> *mut u8 {
     if let Some(gdb_api) = gdb_api_get() {
-        if let Some(f) = gdb_api.pfAlloc {
+        if let Some(f) = gdb_api.malloc {
             return f(size as c_uint) as *mut u8;
         }
     }
@@ -75,7 +75,7 @@ pub unsafe fn alloc(size: usize) -> *mut u8 {
 
 pub unsafe fn realloc(ptr: *mut u8, size: usize) -> *mut u8 {
     if let Some(gdb_api) = gdb_api_get() {
-        if let Some(f) = gdb_api.pfRealloc {
+        if let Some(f) = gdb_api.realloc {
             return f(ptr as *mut c_void, size as c_uint) as *mut u8;
         }
     }
@@ -85,7 +85,7 @@ pub unsafe fn realloc(ptr: *mut u8, size: usize) -> *mut u8 {
 
 pub fn print(s: &str) {
     if let Some(gdb_api) = gdb_api_get() {
-        if let Some(f) = gdb_api.pfLogOutf {
+        if let Some(f) = gdb_api.output {
             if let Ok(c_string) = CString::new(s) {
                 unsafe {
                     f(c_string.as_ptr());
@@ -97,7 +97,7 @@ pub fn print(s: &str) {
 
 pub fn print_debug(s: &str) {
     if let Some(gdb_api) = gdb_api_get() {
-        if let Some(f) = gdb_api.pfDebugOutf {
+        if let Some(f) = gdb_api.output_debug {
             if let Ok(c_string) = CString::new(s) {
                 unsafe {
                     f(c_string.as_ptr());
@@ -109,7 +109,7 @@ pub fn print_debug(s: &str) {
 
 pub fn print_warning(s: &str) {
     if let Some(gdb_api) = gdb_api_get() {
-        if let Some(f) = gdb_api.pfWarnOutf {
+        if let Some(f) = gdb_api.output_warning {
             if let Ok(c_string) = CString::new(s) {
                 unsafe {
                     f(c_string.as_ptr());
@@ -121,7 +121,7 @@ pub fn print_warning(s: &str) {
 
 pub fn print_error(s: &str) {
     if let Some(gdb_api) = gdb_api_get() {
-        if let Some(f) = gdb_api.pfErrorOutf {
+        if let Some(f) = gdb_api.output_error {
             if let Ok(c_string) = CString::new(s) {
                 unsafe {
                     f(c_string.as_ptr());
@@ -135,7 +135,7 @@ pub fn read_mem<T>(addr: u32) -> Result<T, i32> {
     trace!("read_mem. addr: {}", addr);
 
     if let Some(gdb_api) = gdb_api_get() {
-        if let Some(f) = gdb_api.pfReadMem {
+        if let Some(f) = gdb_api.read_byte_array {
             let mut value = std::mem::MaybeUninit::uninit();
             let size = std::mem::size_of::<T>();
 
@@ -154,7 +154,7 @@ pub fn read_mem_by_len(addr: u32, len: usize) -> Result<Vec<u8>, i32> {
     trace!("read_mem_by_len. addr: {}, len: {}", addr, len);
 
     if let Some(gdb_api) = gdb_api_get() {
-        if let Some(f) = gdb_api.pfReadMem {
+        if let Some(f) = gdb_api.read_byte_array {
             let mut buff: Vec<u8> = vec![0u8; len];
 
             if unsafe { f(addr, buff.as_mut_ptr() as *mut c_char, len as c_uint) } as usize == len {
@@ -170,7 +170,7 @@ pub fn read_u8(addr: u32) -> Result<u8, i32> {
     trace!("read_u8. addr: {}", addr);
 
     if let Some(gdb_api) = gdb_api_get() {
-        if let Some(f) = gdb_api.pfReadU8 {
+        if let Some(f) = gdb_api.read_u8 {
             let mut buff: u8 = 0;
 
             if unsafe { f(addr, &mut buff) } as i32 == GDB_OK {
@@ -186,7 +186,7 @@ pub fn read_u16(addr: u32) -> Result<u16, i32> {
     trace!("read_u16. addr: {}", addr);
 
     if let Some(gdb_api) = gdb_api_get() {
-        if let Some(f) = gdb_api.pfReadU16 {
+        if let Some(f) = gdb_api.read_u16 {
             let mut buff: u16 = 0;
 
             if unsafe { f(addr, &mut buff) } as i32 == GDB_OK {
@@ -202,7 +202,7 @@ pub fn read_u32(addr: u32) -> Result<u32, i32> {
     trace!("read_u32. addr: {}", addr);
 
     if let Some(gdb_api) = gdb_api_get() {
-        if let Some(f) = gdb_api.pfReadU32 {
+        if let Some(f) = gdb_api.read_u32 {
             let mut buff: u32 = 0;
 
             if unsafe { f(addr, &mut buff) } as i32 == GDB_OK {
@@ -218,7 +218,7 @@ pub fn write_mem<T: std::fmt::Debug>(addr: u32, data: &T) -> Result<(), i32> {
     trace!("write_mem. addr: {}, data: {:?}", addr, data);
 
     if let Some(gdb_api) = gdb_api_get() {
-        if let Some(f) = gdb_api.pfWriteMem {
+        if let Some(f) = gdb_api.write_byte_array {
             if unsafe {
                 f(
                     addr,
@@ -239,7 +239,7 @@ pub fn write_u8(addr: u32, data: u8) {
     trace!("write_u8. addr: {}, data: {}", addr, data);
 
     if let Some(gdb_api) = gdb_api_get() {
-        if let Some(f) = gdb_api.pfWriteU8 {
+        if let Some(f) = gdb_api.write_u8 {
             unsafe {
                 f(addr, data);
             }
@@ -251,7 +251,7 @@ pub fn write_u16(addr: u32, data: u16) {
     trace!("write_u16. addr: {}, data: {}", addr, data);
 
     if let Some(gdb_api) = gdb_api_get() {
-        if let Some(f) = gdb_api.pfWriteU16 {
+        if let Some(f) = gdb_api.write_u16 {
             unsafe {
                 f(addr, data);
             }
@@ -262,7 +262,7 @@ pub fn write_u16(addr: u32, data: u16) {
 pub fn write_u32(addr: u32, data: u32) {
     trace!("write_u32. addr: {}, data: {}", addr, data);
     if let Some(gdb_api) = gdb_api_get() {
-        if let Some(f) = gdb_api.pfWriteU32 {
+        if let Some(f) = gdb_api.write_u32 {
             unsafe {
                 f(addr, data);
             }
@@ -274,7 +274,7 @@ pub fn convert_u16(data: u16) -> Result<u16, i32> {
     trace!("convert_u16. data: {}", data);
 
     if let Some(gdb_api) = gdb_api_get() {
-        if let Some(f) = gdb_api.pfLoad16TE {
+        if let Some(f) = gdb_api.convert_u16 {
             return Ok(unsafe { f(&data as *const u16 as *const u8) } as u16);
         }
     }
@@ -286,7 +286,7 @@ pub fn convert_u32(data: u32) -> Result<u32, i32> {
     trace!("convert_u32. data: {}", data);
 
     if let Some(gdb_api) = gdb_api_get() {
-        if let Some(f) = gdb_api.pfLoad32TE {
+        if let Some(f) = gdb_api.convert_u32 {
             return Ok(unsafe { f(&data as *const u32 as *const u8) });
         }
     }
@@ -298,7 +298,7 @@ pub fn read_reg(reg_index: u32) -> Result<u32, i32> {
     trace!("read_reg. reg_index: {}", reg_index);
 
     if let Some(gdb_api) = gdb_api_get() {
-        if let Some(f) = gdb_api.pfReadReg {
+        if let Some(f) = gdb_api.read_register {
             return Ok(unsafe { f(reg_index) });
         }
     }
@@ -310,7 +310,7 @@ pub fn write_reg(reg_index: u32, data: u32) {
     trace!("write_reg. reg_index: {}, data: {}", reg_index, data);
 
     if let Some(gdb_api) = gdb_api_get() {
-        if let Some(f) = gdb_api.pfWriteReg {
+        if let Some(f) = gdb_api.write_register {
             unsafe {
                 f(reg_index, data);
             }

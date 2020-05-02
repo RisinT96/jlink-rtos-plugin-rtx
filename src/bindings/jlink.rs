@@ -1,5 +1,8 @@
 //! Bindings auto generated from SEGGER RTOS Plug-in S
 
+use std::option::Option;
+use std::os::raw::{c_char, c_int, c_uchar, c_uint, c_ushort, c_void};
+
 use num_derive::FromPrimitive;
 
 pub const CORE_NONE: u32 = 0;
@@ -238,13 +241,13 @@ pub type RTOS_PLUGIN_CPU_REGS_CORTEX_M = u32;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct RTOS_SYMBOLS {
-    pub name: *const ::std::os::raw::c_char,
-    pub optional: ::std::os::raw::c_int,
-    pub address: ::std::os::raw::c_uint,
+    pub name: *const c_char,
+    pub optional: c_int,
+    pub address: c_uint,
 }
 
 #[derive(FromPrimitive)]
-pub enum RegName {
+pub enum Registers {
     R0 = RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_R0 as isize,
     R1 = RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_R1 as isize,
     R2 = RTOS_PLUGIN_CPU_REGS_CORTEX_M_RTOS_PLUGIN_CPU_REG_CORTEX_M_R2 as isize,
@@ -321,80 +324,197 @@ pub enum RegName {
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct GDB_API {
-    pub pfFree: ::std::option::Option<unsafe extern "C" fn(p: *mut ::std::os::raw::c_void)>,
-    pub pfAlloc: ::std::option::Option<
-        unsafe extern "C" fn(Size: ::std::os::raw::c_uint) -> *mut ::std::os::raw::c_void,
-    >,
-    pub pfRealloc: ::std::option::Option<
-        unsafe extern "C" fn(
-            p: *mut ::std::os::raw::c_void,
-            Size: ::std::os::raw::c_uint,
-        ) -> *mut ::std::os::raw::c_void,
-    >,
-    pub pfLogOutf:
-        ::std::option::Option<unsafe extern "C" fn(sFormat: *const ::std::os::raw::c_char, ...)>,
-    pub pfDebugOutf:
-        ::std::option::Option<unsafe extern "C" fn(sFormat: *const ::std::os::raw::c_char, ...)>,
-    pub pfWarnOutf:
-        ::std::option::Option<unsafe extern "C" fn(sFormat: *const ::std::os::raw::c_char, ...)>,
-    pub pfErrorOutf:
-        ::std::option::Option<unsafe extern "C" fn(sFormat: *const ::std::os::raw::c_char, ...)>,
-    pub pfReadMem: ::std::option::Option<
-        unsafe extern "C" fn(
-            Addr: ::std::os::raw::c_uint,
-            pData: *mut ::std::os::raw::c_char,
-            NumBytes: ::std::os::raw::c_uint,
-        ) -> ::std::os::raw::c_int,
-    >,
-    pub pfReadU8: ::std::option::Option<
-        unsafe extern "C" fn(
-            Addr: ::std::os::raw::c_uint,
-            pData: *mut ::std::os::raw::c_uchar,
-        ) -> ::std::os::raw::c_char,
-    >,
-    pub pfReadU16: ::std::option::Option<
-        unsafe extern "C" fn(
-            Addr: ::std::os::raw::c_uint,
-            pData: *mut ::std::os::raw::c_ushort,
-        ) -> ::std::os::raw::c_char,
-    >,
-    pub pfReadU32: ::std::option::Option<
-        unsafe extern "C" fn(
-            Addr: ::std::os::raw::c_uint,
-            pData: *mut ::std::os::raw::c_uint,
-        ) -> ::std::os::raw::c_char,
-    >,
-    pub pfWriteMem: ::std::option::Option<
-        unsafe extern "C" fn(
-            Addr: ::std::os::raw::c_uint,
-            pData: *const ::std::os::raw::c_char,
-            NumBytes: ::std::os::raw::c_uint,
-        ) -> ::std::os::raw::c_int,
-    >,
-    pub pfWriteU8: ::std::option::Option<
-        unsafe extern "C" fn(Addr: ::std::os::raw::c_uint, Data: ::std::os::raw::c_uchar),
-    >,
-    pub pfWriteU16: ::std::option::Option<
-        unsafe extern "C" fn(Addr: ::std::os::raw::c_uint, Data: ::std::os::raw::c_ushort),
-    >,
-    pub pfWriteU32: ::std::option::Option<
-        unsafe extern "C" fn(Addr: ::std::os::raw::c_uint, Data: ::std::os::raw::c_uint),
-    >,
-    pub pfLoad16TE: ::std::option::Option<
-        unsafe extern "C" fn(p: *const ::std::os::raw::c_uchar) -> ::std::os::raw::c_uint,
-    >,
-    pub pfLoad24TE: ::std::option::Option<
-        unsafe extern "C" fn(p: *const ::std::os::raw::c_uchar) -> ::std::os::raw::c_uint,
-    >,
-    pub pfLoad32TE: ::std::option::Option<
-        unsafe extern "C" fn(p: *const ::std::os::raw::c_uchar) -> ::std::os::raw::c_uint,
-    >,
-    pub pfReadReg: ::std::option::Option<
-        unsafe extern "C" fn(RegIndex: ::std::os::raw::c_uint) -> ::std::os::raw::c_uint,
-    >,
-    pub pfWriteReg: ::std::option::Option<
-        unsafe extern "C" fn(RegIndex: ::std::os::raw::c_uint, Value: ::std::os::raw::c_uint),
-    >,
-    pub Dummy: *mut ::std::os::raw::c_void,
+/// GDB Server API that can be used by the plug-in.
+pub struct GdbApi {
+    /// Frees allocated memory block.
+    ///
+    /// # Arguments
+    /// * `p` - Pointer to the memory block.
+    pub free: Option<unsafe extern "C" fn(p: *mut c_void)>,
+
+    /// Allocates a memory block.
+    ///
+    /// # Arguments
+    /// * `size` - Size of requested memory block.
+    ///
+    /// # Returns
+    /// Pointer to the allocated memory block. null if the memory could not be allocated.
+    pub malloc: Option<unsafe extern "C" fn(size: c_uint) -> *mut c_void>,
+
+    /// Reallocates a memory block.
+    /// If necessary, copies contents of old memory block into new block.
+    ///
+    /// # Arguments
+    /// * `p`    - Pointer to the existing memory block.
+    /// * `size` - Size of newly requested memory block.
+    ///
+    /// # Returns
+    /// Pointer to the allocated memory block. null if the memory could not be allocated.
+    pub realloc: Option<unsafe extern "C" fn(p: *mut c_void, size: c_uint) -> *mut c_void>,
+
+    /// Prints a formatted log message to the J-Link GDB Server's output.
+    ///
+    /// # Arguments
+    /// * `fmt` - Format string (c style).
+    /// * `...` - Variables needed by the format string.
+    pub output: Option<unsafe extern "C" fn(fmt: *const c_char, ...)>,
+
+    /// Prints a formatted log message to the J-Link GDB Server's debug output.
+    /// The debug output is disables in non-debug builds of the J-Link GDB Server.
+    ///
+    /// # Arguments
+    /// * `fmt` - Format string (c style).
+    /// * `...` - Variables needed by the format string.
+    ///
+    /// # Notes
+    /// Since debug builds of the J-Link GDB Server are not publicly available, the debug output should not be used.
+    pub output_debug: Option<unsafe extern "C" fn(fmt: *const c_char, ...)>,
+
+    /// Prints a formatted log message to the J-Link GDB Server's warning output.
+    ///
+    /// # Arguments
+    /// * `fmt` - Format string (c style).
+    /// * `...` - Variables needed by the format string.
+    pub output_warning: Option<unsafe extern "C" fn(fmt: *const c_char, ...)>,
+
+    /// Prints a formatted log message to the J-Link GDB Server's error output.
+    ///
+    /// # Arguments
+    /// * `fmt` - Format string (c style).
+    /// * `...` - Variables needed by the format string.
+    pub output_error: Option<unsafe extern "C" fn(fmt: *const c_char, ...)>,
+
+    /// Reads a byte array from the target system.
+    /// If necessary, the target CPU is halted in order to read memory.
+    ///
+    /// # Arguments
+    /// * `addr` - Target address to read from.
+    /// * 'buff` - Pointer to buffer for read-out.
+    /// * `size` - Number of bytes to read.
+    ///
+    /// # Returns
+    /// * `0`  - Reading memory OK.
+    /// * `<0` - Reading memory failed.
+    pub read_byte_array:
+        Option<unsafe extern "C" fn(addr: c_uint, buff: *mut c_char, size: c_uint) -> c_int>,
+
+    /// Reads one byte from the target system.
+    /// If necessary, the target CPU is halted in order to read memory.
+    ///
+    /// # Arguments
+    /// * `addr` - Target address to read from.
+    /// * 'buff` - Pointer to buffer for read-out.
+    ///
+    /// # Returns
+    /// * `0`  - Reading memory OK.
+    /// * `<0` - Reading memory failed.
+    pub read_u8: Option<unsafe extern "C" fn(addr: c_uint, buff: *mut c_uchar) -> c_char>,
+
+    /// Reads two bytes from the target system.
+    /// If necessary, the target CPU is halted in order to read memory.
+    ///
+    /// # Arguments
+    /// * `addr` - Target address to read from.
+    /// * 'buff` - Pointer to buffer for read-out.
+    ///
+    /// # Returns
+    /// * `0`  - Reading memory OK.
+    /// * `<0` - Reading memory failed.
+    pub read_u16: Option<unsafe extern "C" fn(addr: c_uint, buff: *mut c_ushort) -> c_char>,
+
+    /// Reads four bytes from the target system.
+    /// If necessary, the target CPU is halted in order to read memory.
+    ///
+    /// # Arguments
+    /// * `addr` - Target address to read from.
+    /// * 'buff` - Pointer to buffer for read-out.
+    ///
+    /// # Returns
+    /// * `0`  - Reading memory OK.
+    /// * `<0` - Reading memory failed.
+    pub read_u32: Option<unsafe extern "C" fn(addr: c_uint, buff: *mut c_uint) -> c_char>,
+
+    /// Writes a byte array to the target system.
+    /// If necessary, the target CPU is halted in order to write memory.
+    ///
+    /// # Arguments
+    /// * `addr` - Target address to write to.
+    /// * 'buff` - Pointer to buffer containig data.
+    /// * `size` - Number of bytes to write.
+    ///
+    /// # Returns
+    /// * `0`  - Writing memory OK.
+    /// * `<0` - Writing memory failed.
+    pub write_byte_array:
+        Option<unsafe extern "C" fn(addr: c_uint, buff: *const c_char, size: c_uint) -> c_int>,
+
+    /// Writes one byte to the target system.
+    /// If necessary, the target CPU is halted in order to write memory.
+    ///
+    /// # Arguments
+    /// * `addr` - Target address to write to.
+    /// * 'buff` - Pointer to buffer containig data.
+    pub write_u8: Option<unsafe extern "C" fn(Addr: c_uint, Data: c_uchar)>,
+
+    /// Writes two bytes to the target system.
+    /// If necessary, the target CPU is halted in order to write memory.
+    ///
+    /// # Arguments
+    /// * `addr` - Target address to write to.
+    /// * 'buff` - Pointer to buffer containig data.
+    pub write_u16: Option<unsafe extern "C" fn(Addr: c_uint, Data: c_ushort)>,
+
+    /// Writes four bytes to the target system.
+    /// If necessary, the target CPU is halted in order to write memory.
+    ///
+    /// # Arguments
+    /// * `addr` - Target address to write to.
+    /// * 'buff` - Pointer to buffer containig data.
+    pub write_u32: Option<unsafe extern "C" fn(Addr: c_uint, Data: c_uint)>,
+
+    /// Converts two bytes according to the target's endianness.
+    ///
+    /// # Arguments
+    /// * `p` - Pointer to a u16
+    ///
+    /// # Returns
+    /// The converted value.
+    pub convert_u16: Option<unsafe extern "C" fn(p: *const c_uchar) -> c_uint>,
+
+    /// Converts three bytes according to the target's endianness.
+    ///
+    /// # Arguments
+    /// * `p` - Pointer to a u24
+    ///
+    /// # Returns
+    /// The converted value.
+    pub convert_u24: Option<unsafe extern "C" fn(p: *const c_uchar) -> c_uint>,
+
+    /// Converts four bytes according to the target's endianness.
+    ///
+    /// # Arguments
+    /// * `p` - Pointer to a u32
+    ///
+    /// # Returns
+    /// The converted value.
+    pub convert_u32: Option<unsafe extern "C" fn(p: *const c_uchar) -> c_uint>,
+
+    /// Reads a register from the target's CPU.
+    ///
+    /// # Arguments
+    /// * `reg_index` - Index of the register, refer to [Registers](crate::bindings::jlink::Registers)
+    ///
+    /// # Returns
+    /// Value of the register
+    pub read_register: Option<unsafe extern "C" fn(reg_index: c_uint) -> c_uint>,
+
+    /// Writes a value to the target's CPU register.
+    ///
+    /// # Arguments
+    /// * `reg_index` - Index of the register, refer to [Registers](crate::bindings::jlink::Registers)
+    /// * `value`     - Value of the register
+    pub write_register: Option<unsafe extern "C" fn(reg_index: c_uint, value: c_uint)>,
+
+    /// WTF Segger?! Just WTF?
+    pub dummy: *mut c_void,
 }

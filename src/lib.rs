@@ -237,7 +237,7 @@ pub extern "C" fn RTOS_GetThreadId(index: c_uint) -> c_uint {
 /// * `thread_id` - ID of the thread
 ///
 /// # Return value
-/// Length of the name string.alloc
+/// How many bytes were written to `p_display`.
 ///
 /// # Notes
 /// The space reserved for the name is 256 bytes (including terminating zero), as defined in
@@ -276,7 +276,7 @@ pub extern "C" fn RTOS_GetThreadReg(
         thread_id
     );
 
-    let reg: jlink::RegName = match FromPrimitive::from_u32(reg_index) {
+    let reg: jlink::Registers = match FromPrimitive::from_u32(reg_index) {
         Some(val) => val,
         _ => {
             return api::GDB_ERR;
@@ -289,29 +289,29 @@ pub extern "C" fn RTOS_GetThreadReg(
         return api::GDB_ERR;
     } else if let device::ThreadRegs::Some(regs) = &thread.regs {
         let val = match reg {
-            jlink::RegName::R0 => regs.r0,
-            jlink::RegName::R1 => regs.r1,
-            jlink::RegName::R2 => regs.r2,
-            jlink::RegName::R3 => regs.r3,
-            jlink::RegName::R4 => regs.r4,
-            jlink::RegName::R5 => regs.r5,
-            jlink::RegName::R6 => regs.r6,
-            jlink::RegName::R7 => regs.r7,
-            jlink::RegName::R8 => regs.r8,
-            jlink::RegName::R9 => regs.r9,
-            jlink::RegName::R10 => regs.r10,
-            jlink::RegName::R11 => regs.r11,
-            jlink::RegName::R12 => regs.r12,
-            jlink::RegName::SP => regs.sp,
-            jlink::RegName::LR => regs.lr,
-            jlink::RegName::PC => regs.pc,
-            jlink::RegName::XPSR => regs.xpsr,
-            jlink::RegName::MSP => regs.msp,
-            jlink::RegName::PSP => regs.psp,
-            jlink::RegName::PRIMASK => regs.primask,
-            jlink::RegName::BASEPRI => regs.basepri,
-            jlink::RegName::FAULTMASK => regs.faultmask,
-            jlink::RegName::CONTROL => regs.control,
+            jlink::Registers::R0 => regs.r0,
+            jlink::Registers::R1 => regs.r1,
+            jlink::Registers::R2 => regs.r2,
+            jlink::Registers::R3 => regs.r3,
+            jlink::Registers::R4 => regs.r4,
+            jlink::Registers::R5 => regs.r5,
+            jlink::Registers::R6 => regs.r6,
+            jlink::Registers::R7 => regs.r7,
+            jlink::Registers::R8 => regs.r8,
+            jlink::Registers::R9 => regs.r9,
+            jlink::Registers::R10 => regs.r10,
+            jlink::Registers::R11 => regs.r11,
+            jlink::Registers::R12 => regs.r12,
+            jlink::Registers::SP => regs.sp,
+            jlink::Registers::LR => regs.lr,
+            jlink::Registers::PC => regs.pc,
+            jlink::Registers::XPSR => regs.xpsr,
+            jlink::Registers::MSP => regs.msp,
+            jlink::Registers::PSP => regs.psp,
+            jlink::Registers::PRIMASK => regs.primask,
+            jlink::Registers::BASEPRI => regs.basepri,
+            jlink::Registers::FAULTMASK => regs.faultmask,
+            jlink::Registers::CONTROL => regs.control,
             _ => 0,
         };
 
@@ -323,29 +323,29 @@ pub extern "C" fn RTOS_GetThreadReg(
         return api::GDB_OK;
     } else if let device::ThreadRegs::SomeFpu(regs) = &thread.regs {
         let val = match reg {
-            jlink::RegName::R0 => regs.general.r0,
-            jlink::RegName::R1 => regs.general.r1,
-            jlink::RegName::R2 => regs.general.r2,
-            jlink::RegName::R3 => regs.general.r3,
-            jlink::RegName::R4 => regs.general.r4,
-            jlink::RegName::R5 => regs.general.r5,
-            jlink::RegName::R6 => regs.general.r6,
-            jlink::RegName::R7 => regs.general.r7,
-            jlink::RegName::R8 => regs.general.r8,
-            jlink::RegName::R9 => regs.general.r9,
-            jlink::RegName::R10 => regs.general.r10,
-            jlink::RegName::R11 => regs.general.r11,
-            jlink::RegName::R12 => regs.general.r12,
-            jlink::RegName::SP => regs.general.sp,
-            jlink::RegName::LR => regs.general.lr,
-            jlink::RegName::PC => regs.general.pc,
-            jlink::RegName::XPSR => regs.general.xpsr,
-            jlink::RegName::MSP => regs.general.msp,
-            jlink::RegName::PSP => regs.general.psp,
-            jlink::RegName::PRIMASK => regs.general.primask,
-            jlink::RegName::BASEPRI => regs.general.basepri,
-            jlink::RegName::FAULTMASK => regs.general.faultmask,
-            jlink::RegName::CONTROL => regs.general.control,
+            jlink::Registers::R0 => regs.general.r0,
+            jlink::Registers::R1 => regs.general.r1,
+            jlink::Registers::R2 => regs.general.r2,
+            jlink::Registers::R3 => regs.general.r3,
+            jlink::Registers::R4 => regs.general.r4,
+            jlink::Registers::R5 => regs.general.r5,
+            jlink::Registers::R6 => regs.general.r6,
+            jlink::Registers::R7 => regs.general.r7,
+            jlink::Registers::R8 => regs.general.r8,
+            jlink::Registers::R9 => regs.general.r9,
+            jlink::Registers::R10 => regs.general.r10,
+            jlink::Registers::R11 => regs.general.r11,
+            jlink::Registers::R12 => regs.general.r12,
+            jlink::Registers::SP => regs.general.sp,
+            jlink::Registers::LR => regs.general.lr,
+            jlink::Registers::PC => regs.general.pc,
+            jlink::Registers::XPSR => regs.general.xpsr,
+            jlink::Registers::MSP => regs.general.msp,
+            jlink::Registers::PSP => regs.general.psp,
+            jlink::Registers::PRIMASK => regs.general.primask,
+            jlink::Registers::BASEPRI => regs.general.basepri,
+            jlink::Registers::FAULTMASK => regs.general.faultmask,
+            jlink::Registers::CONTROL => regs.general.control,
             _ => 0,
         };
 
