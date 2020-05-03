@@ -1,11 +1,27 @@
 [package]
-name = 'jlink-rtx-plugin'
-version = '1.0.0'
+name = 'jlink-rtos-plugin-rtx'
+version = '1.0.1'
 authors = ['Tal Risin <risint96@gmail.com>']
 edition = '2018'
+description = 'RTX RTOS thread awareness plugin for the J-Link GDB Server'
+readme = 'README.md'
+repository = 'https://github.com/RisinT96/jlink-rtos-plugin-rtx/'
+license = 'MIT'
+keywords = [
+    'RTX',
+    'RTOS',
+    'JLink',
+    'J-Link',
+    'GDB',
+]
+categories = ['embedded']
+publish = false
+
+[lib]
+name = 'RTOSPlugin_RTX'
+crate-type = ['dylib']
 
 [dependencies]
-pkg-version = '1.0.0'
 ifmt = '0.3.0'
 memchr = '2.3.3'
 chrono = '0.4.11'
@@ -18,6 +34,6 @@ byteorder = '1.3.4'
 version = '0.4.8'
 features = ['std']
 
-[lib]
-name = 'rtx_plugin'
-crate-type = ['dylib']
+[profile.release]
+lto = true
+panic = 'abort'
