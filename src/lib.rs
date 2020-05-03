@@ -380,7 +380,6 @@ pub extern "C" fn RTOS_GetThreadRegList(p_hex_reg_list: *mut c_char, thread_id: 
         }
         device::ThreadRegs::SomeFpu(regs) => {
             ensure!(api::write_string_to_buff(p_hex_reg_list, &regs.to_string()));
-
             api::GDB_OK
         }
     }
