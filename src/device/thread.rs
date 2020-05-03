@@ -208,13 +208,27 @@ impl Thread {
             delay_next: api::convert_u32(thread_info.delay_next)?,
         })
     }
+
+    pub fn irq() -> Thread {
+        Thread {
+            name: "IRQ".to_string(),
+            id: u32::MAX,
+            priority: OsThreadPriority::ISR,
+            state: OsThreadState::Running,
+            regs: ThreadRegs::None,
+
+            thread_next: 0,
+            delay_next: 0,
+        }
+    }
 }
 
 impl std::fmt::Display for Thread {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        if let OsThreadState::Running = self.state
-        {
-            write!(f,"► ")?;
+        if let OsThreadPriority::ISR = self.priority {
+            write!(f, "➤ ")?;
+        } else if let OsThreadState::Running = self.state {
+            write!(f, "⮞ ")?;
         }
 
         if self.name.len() != 0 {
