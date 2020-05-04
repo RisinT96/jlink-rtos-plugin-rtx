@@ -58,7 +58,7 @@ jobs:
     steps:
       - name: Generate Changelog
         id: generate_changelog
-        uses: heinrichreimer/github-changelog-generator-action@v2
+        uses: heinrichreimer/github-changelog-generator-action@v2.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
