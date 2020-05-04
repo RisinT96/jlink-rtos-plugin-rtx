@@ -211,7 +211,7 @@ impl Thread {
 
     pub fn irq() -> Thread {
         Thread {
-            name: "IRQ".to_string(),
+            name: "ISR".to_string(),
             id: std::u32::MAX,
             priority: OsThreadPriority::ISR,
             state: OsThreadState::Running,
