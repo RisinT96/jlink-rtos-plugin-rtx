@@ -1,4 +1,4 @@
-//! Bindings auto generated from SEGGER RTOS Plug-in S
+//! Bindings auto generated from SEGGER RTOS Plug-in SDK
 
 use std::option::Option;
 use std::os::raw::{c_char, c_int, c_uchar, c_uint, c_ushort, c_void};
