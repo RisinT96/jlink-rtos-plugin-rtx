@@ -273,86 +273,86 @@ pub extern "C" fn RTOS_GetThreadReg(
 
     let reg: jlink::Registers = match FromPrimitive::from_u32(reg_index) {
         Some(val) => val,
-        _ => {
-            return api::GDB_ERR;
-        }
+        _ => return api::GDB_ERR,
     };
 
     let thread = ensure!(find_thread_by_id(thread_id));
 
-    if let device::ThreadRegs::None = &thread.regs {
-        return api::GDB_ERR;
-    } else if let device::ThreadRegs::Some(regs) = &thread.regs {
-        let val = match reg {
-            jlink::Registers::R0 => regs.r0,
-            jlink::Registers::R1 => regs.r1,
-            jlink::Registers::R2 => regs.r2,
-            jlink::Registers::R3 => regs.r3,
-            jlink::Registers::R4 => regs.r4,
-            jlink::Registers::R5 => regs.r5,
-            jlink::Registers::R6 => regs.r6,
-            jlink::Registers::R7 => regs.r7,
-            jlink::Registers::R8 => regs.r8,
-            jlink::Registers::R9 => regs.r9,
-            jlink::Registers::R10 => regs.r10,
-            jlink::Registers::R11 => regs.r11,
-            jlink::Registers::R12 => regs.r12,
-            jlink::Registers::SP => regs.sp,
-            jlink::Registers::LR => regs.lr,
-            jlink::Registers::PC => regs.pc,
-            jlink::Registers::XPSR => regs.xpsr,
-            jlink::Registers::MSP => regs.msp,
-            jlink::Registers::PSP => regs.psp,
-            jlink::Registers::PRIMASK => regs.primask,
-            jlink::Registers::BASEPRI => regs.basepri,
-            jlink::Registers::FAULTMASK => regs.faultmask,
-            jlink::Registers::CONTROL => regs.control,
-            _ => 0,
-        };
+    match &thread.regs {
+        device::ThreadRegs::None => api::GDB_ERR,
+        device::ThreadRegs::Some(regs) => {
+            let val = match reg {
+                jlink::Registers::R0 => regs.r0,
+                jlink::Registers::R1 => regs.r1,
+                jlink::Registers::R2 => regs.r2,
+                jlink::Registers::R3 => regs.r3,
+                jlink::Registers::R4 => regs.r4,
+                jlink::Registers::R5 => regs.r5,
+                jlink::Registers::R6 => regs.r6,
+                jlink::Registers::R7 => regs.r7,
+                jlink::Registers::R8 => regs.r8,
+                jlink::Registers::R9 => regs.r9,
+                jlink::Registers::R10 => regs.r10,
+                jlink::Registers::R11 => regs.r11,
+                jlink::Registers::R12 => regs.r12,
+                jlink::Registers::SP => regs.sp,
+                jlink::Registers::LR => regs.lr,
+                jlink::Registers::PC => regs.pc,
+                jlink::Registers::XPSR => regs.xpsr,
+                jlink::Registers::MSP => regs.msp,
+                jlink::Registers::PSP => regs.psp,
+                jlink::Registers::PRIMASK => regs.primask,
+                jlink::Registers::BASEPRI => regs.basepri,
+                jlink::Registers::FAULTMASK => regs.faultmask,
+                jlink::Registers::CONTROL => regs.control,
+                _ => 0,
+            };
 
-        ensure!(api::write_string_to_buff(
-            p_hex_reg_val,
-            &format!("{:08x}", val)
-        ));
+            ensure!(api::write_string_to_buff(
+                p_hex_reg_val,
+                &format!("{:08x}", val)
+            ));
 
-        return api::GDB_OK;
-    } else if let device::ThreadRegs::SomeFpu(regs) = &thread.regs {
-        let val = match reg {
-            jlink::Registers::R0 => regs.general.r0,
-            jlink::Registers::R1 => regs.general.r1,
-            jlink::Registers::R2 => regs.general.r2,
-            jlink::Registers::R3 => regs.general.r3,
-            jlink::Registers::R4 => regs.general.r4,
-            jlink::Registers::R5 => regs.general.r5,
-            jlink::Registers::R6 => regs.general.r6,
-            jlink::Registers::R7 => regs.general.r7,
-            jlink::Registers::R8 => regs.general.r8,
-            jlink::Registers::R9 => regs.general.r9,
-            jlink::Registers::R10 => regs.general.r10,
-            jlink::Registers::R11 => regs.general.r11,
-            jlink::Registers::R12 => regs.general.r12,
-            jlink::Registers::SP => regs.general.sp,
-            jlink::Registers::LR => regs.general.lr,
-            jlink::Registers::PC => regs.general.pc,
-            jlink::Registers::XPSR => regs.general.xpsr,
-            jlink::Registers::MSP => regs.general.msp,
-            jlink::Registers::PSP => regs.general.psp,
-            jlink::Registers::PRIMASK => regs.general.primask,
-            jlink::Registers::BASEPRI => regs.general.basepri,
-            jlink::Registers::FAULTMASK => regs.general.faultmask,
-            jlink::Registers::CONTROL => regs.general.control,
-            _ => 0,
-        };
+            api::GDB_OK
+        }
+        device::ThreadRegs::SomeFpu(regs) => {
+            let val = match reg {
+                jlink::Registers::R0 => regs.general.r0,
+                jlink::Registers::R1 => regs.general.r1,
+                jlink::Registers::R2 => regs.general.r2,
+                jlink::Registers::R3 => regs.general.r3,
+                jlink::Registers::R4 => regs.general.r4,
+                jlink::Registers::R5 => regs.general.r5,
+                jlink::Registers::R6 => regs.general.r6,
+                jlink::Registers::R7 => regs.general.r7,
+                jlink::Registers::R8 => regs.general.r8,
+                jlink::Registers::R9 => regs.general.r9,
+                jlink::Registers::R10 => regs.general.r10,
+                jlink::Registers::R11 => regs.general.r11,
+                jlink::Registers::R12 => regs.general.r12,
+                jlink::Registers::SP => regs.general.sp,
+                jlink::Registers::LR => regs.general.lr,
+                jlink::Registers::PC => regs.general.pc,
+                jlink::Registers::XPSR => regs.general.xpsr,
+                jlink::Registers::MSP => regs.general.msp,
+                jlink::Registers::PSP => regs.general.psp,
+                jlink::Registers::PRIMASK => regs.general.primask,
+                jlink::Registers::BASEPRI => regs.general.basepri,
+                jlink::Registers::FAULTMASK => regs.general.faultmask,
+                jlink::Registers::CONTROL => regs.general.control,
+                _ => 0,
+            };
 
-        trace!("reg value: {}", val);
+            trace!("reg value: {}", val);
 
-        ensure!(api::write_string_to_buff(
-            p_hex_reg_val,
-            &format!("{:08x}", val)
-        ));
+            ensure!(api::write_string_to_buff(
+                p_hex_reg_val,
+                &format!("{:08x}", val)
+            ));
+
+            api::GDB_OK
+        }
     }
-
-    api::GDB_ERR
 }
 
 /// Copies the thread’s general registers' values into `p_hex_reg_list` as a HEX string.
@@ -372,19 +372,17 @@ pub extern "C" fn RTOS_GetThreadRegList(p_hex_reg_list: *mut c_char, thread_id: 
 
     let thread = ensure!(find_thread_by_id(thread_id));
 
-    if let device::ThreadRegs::None = &thread.regs {
-        return api::GDB_ERR;
-    } else if let device::ThreadRegs::Some(regs) = &thread.regs {
-        ensure!(api::write_string_to_buff(p_hex_reg_list, &regs.to_string()));
-
-        return api::GDB_OK;
-    } else if let device::ThreadRegs::SomeFpu(regs) = &thread.regs {
-        ensure!(api::write_string_to_buff(p_hex_reg_list, &regs.to_string()));
-
-        return api::GDB_OK;
+    match &thread.regs {
+        device::ThreadRegs::None => api::GDB_ERR,
+        device::ThreadRegs::Some(regs) => {
+            ensure!(api::write_string_to_buff(p_hex_reg_list, &regs.to_string()));
+            api::GDB_OK
+        }
+        device::ThreadRegs::SomeFpu(regs) => {
+            ensure!(api::write_string_to_buff(p_hex_reg_list, &regs.to_string()));
+            api::GDB_OK
+        }
     }
-
-    api::GDB_ERR
 }
 
 /// Sets the thread’s register's value to `p_hex_reg_val`, given as a HEX string.

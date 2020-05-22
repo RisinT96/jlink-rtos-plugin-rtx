@@ -6,6 +6,7 @@ use crate::bindings::rtos;
 use crate::bindings::rtos::osRtxInfo;
 use crate::host::api;
 
+use crate::device::core;
 use crate::device::thread::{Thread, ThreadDelayList, ThreadReadyList};
 
 pub struct RtxInfo {
@@ -43,6 +44,12 @@ impl RtxInfo {
                 return Ok(RtxInfo { threads });
             }
         };
+
+        let is_in_irq = core::is_in_irq()?;
+        if is_in_irq {
+            debug!("MCU is in IRQ!");
+            threads.push(Thread::irq());
+        }
 
         debug!("Loading currently running thread");
         threads.push(Thread::new(
