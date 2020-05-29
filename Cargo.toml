@@ -1,6 +1,6 @@
 [package]
 name = 'jlink-rtos-plugin-rtx'
-version = '1.0.1'
+version = '1.0.3'
 authors = ['Tal Risin <risint96@gmail.com>']
 edition = '2018'
 description = 'RTX RTOS thread awareness plugin for the J-Link GDB Server'
@@ -19,7 +19,7 @@ publish = false
 
 [lib]
 name = 'RTOSPlugin_RTX'
-crate-type = ['dylib']
+crate-type = ['cdylib']
 
 [dependencies]
 ifmt = '0.3.0'
