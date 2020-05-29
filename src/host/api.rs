@@ -19,7 +19,7 @@ pub use crate::bindings::jlink::GdbApi;
 pub const GDB_OK: i32 = 0;
 pub const GDB_ERR: i32 = -1;
 
-/// WTF SEGGER!? just WTF.
+/// Segger expect only the registers found in `org.gnu.gdb.arm.m-profile`.
 pub const GDB_REG_LIST_LEN: usize = 17;
 
 macro_rules! ensure {

@@ -36,7 +36,7 @@ pub(in crate::device) struct ThreadDelayList {
 
 #[repr(C)]
 #[derive(Copy, Clone)]
-/// Structure of thread's registers when they're stacked on IRQ, the rest are kept in the CPU.
+/// Structure of thread's registers when they're dumped by hardware on IRQ entry, the rest are kept in the CPU.
 struct GeneralRegsStackedHw {
     r0: u32,
     r1: u32,
@@ -50,7 +50,10 @@ struct GeneralRegsStackedHw {
 
 #[repr(C)]
 #[derive(Copy, Clone)]
-/// Structure of thread's registers when they're stacked on context switch.
+/// Structure of thread's registers when they're stacked on RTX context switch.
+/// First the hardware auto-dumps the registers on RTX service IRQ entry, followed by registers dumped by RTX's context 
+/// switch logic.
+/// Note: The stack grows from bottom up - thus the order being reversed.
 struct GeneralRegsStacked {
     r4: u32,
     r5: u32,
@@ -65,7 +68,8 @@ struct GeneralRegsStacked {
 
 #[repr(C)]
 #[derive(Copy, Clone)]
-/// Structure of thread's registers with FPU enabled, when they're stacked on IRQ, the rest are kept in the CPU.
+/// Structure of thread's registers with FPU enabled, when they're sumped by hardware on IRQ entry, the rest are kept in
+/// the CPU.
 struct GeneralRegsFpuStackedHw {
     r0: u32,
     r1: u32,
@@ -96,7 +100,10 @@ struct GeneralRegsFpuStackedHw {
 
 #[repr(C)]
 #[derive(Copy, Clone)]
-/// Structure of thread's registers when they're stacked on context switch.
+/// Structure of thread's registers when they're stacked on RTX context switch, with FPU enabled.
+/// First the hardware auto-dumps the registers on RTX service IRQ entry, followed by registers dumped by RTX's context 
+/// switch logic.
+/// Note: The stack grows from bottom up - thus the order being reversed.
 struct GeneralRegsFpuStacked {
     s16: u32,
     s17: u32,
@@ -234,7 +241,7 @@ impl std::fmt::Display for Thread {
         if self.name.len() != 0 {
             write!(
                 f,
-                "{name} <{id:#010X}> [{priority}] ({state})",
+                "{name} <{id:#010X}> ({state}) [{priority}]",
                 id = self.id,
                 name = self.name,
                 priority = self.priority,
@@ -243,7 +250,7 @@ impl std::fmt::Display for Thread {
         } else {
             write!(
                 f,
-                "<{id:#010X}> [{priority}] ({state})",
+                "<{id:#010X}> ({state}) [{priority}]",
                 id = self.id,
                 priority = self.priority,
                 state = self.state
