@@ -61,6 +61,7 @@ jobs:
         uses: heinrichreimer/github-changelog-generator-action@v2.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          stringGeneratorNotic: true
 
       - name: Create Release
         id: create_release
@@ -70,8 +71,7 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
-          body: |
-            ${{ steps.generate_changelog.outputs.changelog }}
+          body: ${{ steps.generate_changelog.outputs.changelog }}
 
       - name: Download Build Artifacts
         uses: actions/download-artifact@v2
